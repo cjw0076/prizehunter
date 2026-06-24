@@ -1,0 +1,37 @@
+# Credentials & secrets
+.env
+*.env
+.vault/
+vault/
+credentials.json
+token_*
+*_token
+*.key
+*.pem
+
+# Personal campaign data
+campaigns/
+session_corpus/
+context/
+sleep/adapters/
+EXIT/packages/
+aios_outbox/
+receipts/
+portfolio_registry.tsv
+
+# Runtime
+__pycache__/
+*.pyc
+*.pyo
+*.log
+*.tmp
+candidates_*.tsv
+DISCOVERY_REPORT.md
+PORTFOLIO_STATUS.md
+.omc/
+.aios/
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db
