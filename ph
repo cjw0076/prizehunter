@@ -59,6 +59,10 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph capabilities [filter]      check which tools/MCPs are available vs missing for active campaigns
   ph find-tool "<need>"         search MCP marketplaces for a specific capability
   ph creative "<topic>" [key]   anti-AI-default creative divergence: 5 wild framings before building
+  ph autonomy             self-check: what runs unattended vs what to fill
+  ph onboard [gate]       ask for ONLY the credential a gate needs, then resume
+  ph session --site <s>   log in once → agent extracts API token from browser → vault
+  ph vault KEY VALUE      store one supplied credential (gitignored)
   ph calibrate           predicted-vs-actual → triage self-correction (getting smarter)
   ph council "<q>"       heterogeneous 2nd opinion (your codex/gemini/nim/ollama)
   ph issue "<title>"     file a GitHub issue (agent-native self-reporting)
@@ -160,6 +164,10 @@ EOF
   requests) grep -E "^\## \[(pending|in_progress)\]" "$PH_HOME/founder_requests.md" 2>/dev/null || echo "No pending founder requests."
             echo; echo "Full log: $PH_HOME/founder_requests.md"
             echo "next → pick the first [pending] item and execute as highest-priority work" ;;
+  autonomy) bash "$T/ph_gates.sh" ;;
+  onboard)  bash "$T/onboard.sh" "$@" ;;
+  session)  python3 "$T/session_capture.py" "$@" ;;
+  vault)    bash "$T/vault_set.sh" "$@" ;;
   calibrate) python3 "$T/calibration.py" "$@"; sed -n "1,30p" "$PH_HOME/CALIBRATION_REPORT.md" 2>/dev/null
             echo "next → feed the triage nudge into triage_competition.py priors" ;;
   council)  bash "$T/council.sh" "$@"; echo "next → synthesize the independent reads, verify, then decide" ;;

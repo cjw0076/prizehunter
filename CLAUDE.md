@@ -55,6 +55,19 @@ Every competition's postmortem + lessons + calibration feed the NEXT one:
 **expert priming** (past lessons + similar-competition outcomes injected up front),
 and triage weights **self-correct** from accumulated calibration. See `INTELLIGENCE.md`.
 
+## Onboarding — ask for the minimum, automate the rest
+The agent runs autonomously until a gate blocks the work the user asked for. Then:
+1. `./ph autonomy` — what's unattended now vs what a credential unlocks.
+2. **Web-login gate** (DACON/Kaggle/portal): the user logs in ONCE (or gives creds),
+   then the agent extracts the API token from the browser's dev-tools/network layer —
+   `./ph session --site <name> --headed` (or `--creds`) → token → `.vault` → the
+   platform's API is now agent-driven. Token-API platforms then run unattended.
+3. **Missing token/credential**: `./ph onboard <gate>` prints the single NEED block;
+   the user supplies just that value; `./ph vault KEY VALUE` stores it; autonomy resumes.
+Ask for ONLY what the current task needs — never a wall of forms. Structurally
+human-only (signup / 2FA / CAPTCHA / final external-submit approval / spend) stays a
+one-line gate; surface it and keep working everything else.
+
 ## Safety gates (never bypass)
 - Outward-facing/irreversible actions are **operator-gated**: external submission,
   account signup, ToS acceptance, real-money spend. Recommend + prepare; a human triggers.

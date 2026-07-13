@@ -45,3 +45,5 @@ chmod +x "$CT/tools/"*.py 2>/dev/null || true
 echo ""
 echo "=== Setup complete ==="
 echo "Next: export CT=$CT && ./ph help"
+echo ""
+bash "$CT/tools/ph_gates.sh" 2>/dev/null || true

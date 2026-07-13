@@ -70,3 +70,5 @@ EXIT/
 receipts/
 aios_outbox/
 sleep/
+tools/.session_*.json
+.session_*.json
