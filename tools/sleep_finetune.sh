@@ -10,6 +10,9 @@
 #   "prizehunter-instinct" served at localhost:11434 for fast TRIAGE/RECON priming
 
 set -euo pipefail
+# cron PATH lacks miniconda — without this `conda` never resolves and the finetune
+# silently fell back to system python3 (no trl) every night
+[ -d "$HOME/miniconda3/bin" ] && export PATH="$HOME/miniconda3/bin:$PATH"
 CT="$(cd "$(dirname "$0")/.." && pwd)"
 SLEEP_DIR="$CT/sleep"
 LOG="$SLEEP_DIR/sleep.log"
@@ -47,8 +50,8 @@ if [[ "$PAIR_COUNT" -lt 10 ]]; then
 fi
 log "Pairs: $PAIR_COUNT"
 
-# 3. LoRA fine-tune (requires peft + trl)
-python3 - <<'PYEOF'
+# 3. LoRA fine-tune (requires peft + trl) — must run in the conda env, not bare python3
+"$PYTHON" - <<'PYEOF'
 import sys
 try:
     from trl import SFTTrainer, SFTConfig
@@ -95,9 +98,24 @@ PYEOF
 
 log "LoRA adapter saved → $ADAPTER_DIR/latest"
 
-# 4. Convert to GGUF + create Ollama model
-# ponytail: skip GGUF conversion for now; serve adapter via transformers pipeline instead
-# TODO: llama.cpp convert_hf_to_gguf.py → ollama create prizehunter-instinct -f Modelfile
+# 4. Convert LoRA → GGUF → refresh the Ollama model (guarded: skips with a log if
+#    the convert script / gguf pkg / ollama base model are missing — never blocks step 5)
+LLAMA_CPP="${LLAMA_CPP:-$HOME/tools/llama.cpp}"
+if [ -f "$LLAMA_CPP/convert_lora_to_gguf.py" ] && ollama list 2>/dev/null | grep -q '^qwen3:8b'; then
+  if "$PYTHON" "$LLAMA_CPP/convert_lora_to_gguf.py" "$ADAPTER_DIR/latest" \
+        --base "$BASE_MODEL" --outfile "$SLEEP_DIR/adapter.gguf" --outtype f16 >>"$LOG" 2>&1; then
+    printf 'FROM qwen3:8b\nADAPTER %s\n' "$SLEEP_DIR/adapter.gguf" > "$SLEEP_DIR/Modelfile"
+    if ollama create "$OLLAMA_MODEL_NAME" -f "$SLEEP_DIR/Modelfile" >>"$LOG" 2>&1; then
+      log "Ollama model refreshed: $OLLAMA_MODEL_NAME (adapter.gguf)"
+    else
+      log "ollama create failed — adapter still usable via transformers"
+    fi
+  else
+    log "LoRA→GGUF conversion failed — adapter still usable via transformers"
+  fi
+else
+  log "GGUF step skipped (need $LLAMA_CPP/convert_lora_to_gguf.py + ollama qwen3:8b)"
+fi
 
 # 5. Register adapter path for TRIAGE/RECON to use
 echo "$ADAPTER_DIR/latest" > "$SLEEP_DIR/current_adapter.txt"

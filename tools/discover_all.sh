@@ -7,6 +7,8 @@
 set -euo pipefail
 
 CONTROL="$(cd -- "$(dirname "$0")/.." && pwd)"
+# cron PATH lacks miniconda — needed for playwright (render adapters) + kaggle CLI
+[ -d "$HOME/miniconda3/bin" ] && export PATH="$HOME/miniconda3/bin:$PATH"
 REPORT="$CONTROL/DISCOVERY_REPORT.md"
 when="$(date '+%Y-%m-%d %H:%M:%S %Z')"
 

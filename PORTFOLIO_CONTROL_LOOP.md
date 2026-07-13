@@ -9,15 +9,15 @@ even when an agent forgets to record.
 
 This is the reusable backbone of the prize-hunting package. It sits above the
 six-contest command tower and also pulls in the standalone DACON competitions
-(`aibias/`, `etri/`) that previously lived outside the asset system.
+that previously lived outside the asset system.
 
 ## Why it exists (the two gaps it closes)
 
 Audit 2026-06-08 found two structural leaks in the record-asset system:
 
-1. **Coverage gap** — the two most-advanced real competitions (DACON 236722,
-   236690) recorded work only in local ledgers (`aibias/ledger_236722.md`,
-   `etri/docs/AGENT_WORKLOG.md`) and never entered the control-tower receipt /
+1. **Coverage gap** — the most-advanced competitions
+   can record work only in local ledgers
+   and never enter the control-tower receipt /
    AIOS pipeline. Their IP (signal-ceiling proof, honest-CV, leak detection)
    was not being captured as a sellable asset.
 2. **Freshness gap** — the AIOS asset loop only ran when someone manually
@@ -60,15 +60,15 @@ must remember.
    transfer evidence gets worse.
 5. **FOUNDER blockers stop cleanly.** Rows blocked on operator credentials are
    prefixed `FOUNDER:` — agents record the blocker and wait; they do not spin.
-6. **Promotion to MyWorld AIOS is deliberate.** The loop writes to the local
-   `aios_outbox/` staging only. Promoting a packet to the cross-repo MyWorld
-   ledger is a manual `export_aios_packet.sh --append-myworld-ledger` step
+6. **Promotion to an external AIOS ledger is deliberate.** The loop writes to the local
+   `aios_outbox/` staging only. Promoting a packet to a cross-repo AIOS
+   ledger is a manual `export_aios_packet.sh --append-aios-ledger` step
    (draft-first / operator-override invariants).
 
 ## Daily / resume flow
 
 ```bash
-cd /home/user/workspaces/jaewon/dacon
+cd <repo-root>
 # see where everything stands + any recording gaps
 cat competitions/control_tower/PORTFOLIO_STATUS.md
 # force a refresh (also runs automatically every 3h)

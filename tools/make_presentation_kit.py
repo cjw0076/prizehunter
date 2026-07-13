@@ -12,7 +12,7 @@ These are the agent-producible parts of video/presentation deliverables. The
 human only records/uploads. Pull real numbers from PLAN + results to avoid fluff.
 
 Usage:
-  make_presentation_kit.py --key 236716 [--results "best 0.91, rank 3->1 lever X"]
+  make_presentation_kit.py --key <your-key> [--results "best 0.91, rank 3->1 lever X"]
 """
 import json, os, argparse
 

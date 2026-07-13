@@ -8,7 +8,7 @@ Given a competition (key + name + signals), produce campaigns/<key>/PLAN.{md,jso
 The executor (run_campaign.sh) walks this plan, dispatching each sub-objective.
 
 Usage:
-  plan_campaign.py --key 236999 --name "..." [--domain ml] [--metric accuracy]
+  plan_campaign.py --key <your-key> --name "..." [--domain ml] [--metric accuracy]
                    [--platform dacon] [--prize 10000]
 """
 import json, re, sys, os, argparse
