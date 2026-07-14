@@ -72,3 +72,5 @@ aios_outbox/
 sleep/
 tools/.session_*.json
 .session_*.json
+APPROACH_ONTOLOGY.tsv
+approach.ttl

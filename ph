@@ -63,6 +63,8 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph onboard [gate]       ask for ONLY the credential a gate needs, then resume
   ph session --site <s>   log in once → agent extracts API token from browser → vault
   ph vault KEY VALUE      store one supplied credential (gitignored)
+  ph ontology             build the approach/context ontology from finished competitions
+  ph inherit <key|-m M>   inherit+evolve approaches for a new competition (from ontology)
   ph calibrate           predicted-vs-actual → triage self-correction (getting smarter)
   ph council "<q>"       heterogeneous 2nd opinion (your codex/gemini/nim/ollama)
   ph issue "<title>"     file a GitHub issue (agent-native self-reporting)
