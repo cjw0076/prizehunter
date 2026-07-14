@@ -26,8 +26,17 @@ reaches **rank #1**, an **adversarially-verified honest ceiling**, or its **dead
 nothing else stops it.
 
 1. `tools/portfolio_tick.sh` — refresh board, record, deposit flywheel knowledge.
-2. **Drive to #1** — for each live competition, `ph goal <key>` returns the verdict and
-   you act on it, tuned to THAT competition's metric:
+2. **Drive to #1** — the loop itself is competition-shaped, not fixed:
+   - **First design it**: `ph goal --design <key>` detects the archetype
+     (leaderboard-classification/regression · code-submission · rl-agentic · timeseries ·
+     judged) and proposes a tailored loop — its goal/termination, per-cycle levers, slot
+     policy, and ceiling test. YOU read the competition's RECON/data and adapt it to its
+     specifics (odd metric, a leak, an external-data rule, a judging rubric, slot count),
+     then save the tailored spec. A judged/creative competition gets a judge-fit loop with
+     no numeric #1; a leaderboard one gets a gap-closing loop; a code-submission one gates
+     on a reproduced offline scorer — each different by design.
+   - **Then drive that designed loop**: `ph goal <key>` returns the verdict against THIS
+     competition's own spec, tuned to its metric:
    - `PUSH`  → keep improving: `ph inherit <key>` (past approaches) → `ph council` (next lever) →
      optimize toward the winning lever → submit → re-verdict. Repeat until the gap closes.
    - `CEILING?` (stalled N cycles) → do **not** stop yet: `ph council "honest ceiling or luck-mining?"`

@@ -75,3 +75,4 @@ tools/.session_*.json
 APPROACH_ONTOLOGY.tsv
 approach.ttl
 .runs/goal_*.json
+.runs/loopspec_*.json
