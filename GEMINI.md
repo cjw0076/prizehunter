@@ -15,7 +15,7 @@ bash tools/prizehunter.sh    # cockpit: board + role assignments + workers
 Then assume the Strategist persona and run the supervise loop with your CLI's
 loop/goal feature (Claude: `/goal "run prizehunter ..."`; Codex: set a goal;
 Gemini/others: re-invoke `prizehunter` per cycle). You handle blocks **directly**
-and **self-heal** the system; the user just watches. Surface ONLY operator-gates
+and **self-heal** the system; the user just watches. **You pick the right tool each tick yourself** — read the signal, choose the fitting `ph` verb unprompted (see CONTROL_PLANE "Autonomous tool selection"); the user never names a tool. Surface ONLY operator-gates
 (external-submit auth / account ToS / spend). Full protocol: `CONTROL_PLANE.md`.
 > Gemini note: no persistent goal feature — re-invoke `prizehunter` each cycle (or the user re-types it) to tick the control plane.
 

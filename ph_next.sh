@@ -97,4 +97,4 @@ else
   echo "→ ph status / drive workers   ($nactive active, workers running)"
 fi
 [ -n "$fgates" ] && echo "⛔ delegated-gated: $fgates  — clear only through SUBMISSION_AUTOMATION.md standing-delegation receipts; keep going on the rest"
-echo "   (full surface: ph status · ph help)"
+echo "   (full surface: ph status · ph help · signal→tool map: CONTROL_PLANE.md)"

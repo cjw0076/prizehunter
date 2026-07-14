@@ -32,6 +32,28 @@ observe → drive → intervene → self-heal → reallocate → repeat
 6. **Reallocate**: `tools/assign_roles.sh` — shift effort to highest-EV; drop dead / no-prize.
 7. Repeat.
 
+## Autonomous tool selection — no human names the tool
+
+Every tick, YOU read the situation and pick the right tool yourself. The user never
+says "run ph council" or "use ph inherit" — you infer it from the signal. Follow this
+map (and compose freely; `ph help` is the full surface, `ph next` is the mechanical hint):
+
+| signal you observe | tool you reach for, unprompted |
+|---|---|
+| entering / planning a new competition | `ph inherit <key>` (inherit proven approaches from the ontology) → `ph gap` → `ph plan` |
+| a keystone call (which submission, strategy, a ceiling/impossibility claim) | `ph council "…"` — get a heterogeneous read BEFORE accepting; same-weights = fake consensus |
+| the approach feels stale / ideas exhausted | `ph creative "<topic>"` (wild framings before building) |
+| a credential / web-login gate blocks the task | `ph onboard <gate>` → `ph vault` / `ph session --site <s>` (turn a login into a token) |
+| you need another agent's capability | `ph route "<need>"` → `ph dispatch <agent> "<task>"` |
+| a competition resolved / results are out | `ph results` → `ph settle close <key> …` → `ph ontology` (learn) → `ph calibrate` |
+| a tool/stage errored and you couldn't self-heal it | `ph issue "<title>"` (file it) |
+| genuinely unsure what's next | `ph next` |
+
+Rule: a human does not choose the tool. Each cycle you read the signals (registry
+state, open gates, pending results, blocked workers) and select + run the fitting
+tool on your own. An explicit human instruction is only ever an override, not the
+normal path. This is what "hands-off" means: the operator watches; you orchestrate.
+
 ## The ONLY things surfaced to the human (operator-gates)
 
 Irreducible, outward-facing, or PII/spend: external-platform submission auth,
