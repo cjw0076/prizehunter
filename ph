@@ -65,6 +65,7 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph vault KEY VALUE      store one supplied credential (gitignored)
   ph ontology             build the approach/context ontology from finished competitions
   ph inherit <key|-m M>   inherit+evolve approaches for a new competition (from ontology)
+  ph goal [key|--board]   per-competition verdict: PUSH/CEILING?/AT_#1 until rank #1
   ph calibrate           predicted-vs-actual → triage self-correction (getting smarter)
   ph council "<q>"       heterogeneous 2nd opinion (your codex/gemini/nim/ollama)
   ph issue "<title>"     file a GitHub issue (agent-native self-reporting)

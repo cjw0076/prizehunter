@@ -19,10 +19,22 @@ surfaces to the human ONLY irreducible operator-gates. Full automation.
 ## The loop (agent acts directly every tick — never defers to the user)
 
 ```
-observe → drive → intervene → self-heal → reallocate → repeat
+observe → drive-to-#1 → intervene → self-heal → reallocate → repeat
 ```
+This is a **GOAL loop, not a supervise loop**: each competition keeps looping until it
+reaches **rank #1**, an **adversarially-verified honest ceiling**, or its **deadline** —
+nothing else stops it.
+
 1. `tools/portfolio_tick.sh` — refresh board, record, deposit flywheel knowledge.
-2. **Drive**: `tools/run_campaign.sh --key <K> --execute` for each GO money-comp (parallel via `tools/run_parallel.sh`).
+2. **Drive to #1** — for each live competition, `ph goal <key>` returns the verdict and
+   you act on it, tuned to THAT competition's metric:
+   - `PUSH`  → keep improving: `ph inherit <key>` (past approaches) → `ph council` (next lever) →
+     optimize toward the winning lever → submit → re-verdict. Repeat until the gap closes.
+   - `CEILING?` (stalled N cycles) → do **not** stop yet: `ph council "honest ceiling or luck-mining?"`
+     + check the live LB; if teams sit above your best, keep pushing. Stop only if it survives.
+   - `AT_#1`  → bank it (`ph settle close`), extract the winning approach (`ph ontology`), move on.
+   - `ph goal --board` shows every competition's verdict at a glance.
+   (`run_campaign.sh`/`run_parallel.sh` execute the actual drive work each cycle.)
 3. **Intervene directly** on any blocked worker: dispatch the best agent to unblock,
    or fix it yourself in the worker's dir. Do NOT ask the user.
 4. **Self-heal**: if a tool/stage errors, FIX THE SYSTEM — `tools/record_failure_learning.sh`,

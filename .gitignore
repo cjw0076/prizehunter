@@ -74,3 +74,4 @@ tools/.session_*.json
 .session_*.json
 APPROACH_ONTOLOGY.tsv
 approach.ttl
+.runs/goal_*.json
