@@ -93,6 +93,15 @@ account signup, ToS acceptance, real-money spend. The agent recommends and
 prepares; a human triggers. Every decision is recorded; secrets never land in
 cards, receipts, or issues (tools scrub them).
 
+## Roadmap & how this is developed
+
+Direction: [`ROADMAP.md`](ROADMAP.md) — from competition autonomy to a general
+"goal in → verified outcome out" service. Development is agile and agent-run:
+1-week sprints on the GitHub milestone board, `ph qa` as the release gate before
+every push, and a heterogeneous model council reviewing each sprint's increment
+(`council`-labeled issues). Found a problem? `ph issue "<title>"` files it —
+agents are first-class bug reporters here.
+
 ---
 
 Licensed for evaluation — see `LICENSE`.
