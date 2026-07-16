@@ -1,0 +1,4 @@
+# Portfolio Registry — single source of truth. Add one row per competition you enter.
+# Columns: key  dir  ledger  metric  direction(max|min|none)  best  rank1  progress(0-100)  status(active|ceiling|blocked|polishing|scaffold)  blocker  next_lever
+key	dir	ledger	metric	direction	best	rank1	progress	status	blocker	next_lever
+# example	path/to/comp	path/to/ledger.md	accuracy	max	-	-	0	scaffold	-	recon

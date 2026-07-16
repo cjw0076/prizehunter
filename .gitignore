@@ -17,7 +17,7 @@ sleep/adapters/
 EXIT/packages/
 aios_outbox/
 receipts/
-portfolio_registry.tsv
+/portfolio_registry.tsv
 
 # Runtime
 __pycache__/
