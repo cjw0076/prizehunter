@@ -74,6 +74,7 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
 EOF
     ;;
   status)   bash "$T/strategist_brief.sh" >/dev/null 2>&1; python3 "$T/quality_gate.py" >/dev/null 2>&1
+            python3 "$T/activation.py" --line 2>/dev/null
             sed -n '1,40p' "$PH_HOME/STRATEGIST_BRIEF.md" 2>/dev/null
             echo
             echo "## Quality Gate (progress ≠ win probability)"

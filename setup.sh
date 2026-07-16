@@ -42,6 +42,10 @@ fi
 chmod +x "$CT/ph" "$CT/tools/"*.sh 2>/dev/null || true
 chmod +x "$CT/tools/"*.py 2>/dev/null || true
 
+# 7. Activation funnel (north-star: clone -> first competition, measured)
+mkdir -p "$CT/.runs" && touch "$CT/.runs/setup_stamp"
+python3 "$CT/tools/activation.py" --line 2>/dev/null || true
+
 echo ""
 echo "=== Setup complete ==="
 echo "Next: export CT=$CT && ./ph help"
