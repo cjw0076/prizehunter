@@ -69,6 +69,7 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph calibrate           predicted-vs-actual → triage self-correction (getting smarter)
   ph council "<q>"       heterogeneous 2nd opinion (your codex/gemini/nim/ollama)
   ph issue "<title>"     file a GitHub issue (agent-native self-reporting)
+  ph qa                  release gate: fresh-clone smoke + parse + secrets (run before push)
   ph doctor              health-check the tools (find broken ones)
 EOF
     ;;
@@ -177,5 +178,6 @@ EOF
   issue)    t="${1:?ph issue \"<title>\" [body]}"; b="${2:-}"; bash "$T/report_issue.sh" --title "$t" --body "$b"
             echo "next → maintainer triages; set PH_ISSUE_REPO=owner/name to route" ;;
   doctor)   bash "$PH_HOME/ph_next.sh" --doctor 2>/dev/null || { echo "checking tools..."; for f in "$T"/*.sh; do bash -n "$f" 2>/dev/null || echo "  ❌ syntax: $(basename "$f")"; done; echo "done"; } ;;
+  qa)       bash "$T/qa_harness.sh" "$@" ;;
   *) echo "unknown verb: $v"; exec "$0" help ;;
 esac

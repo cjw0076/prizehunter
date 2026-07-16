@@ -18,6 +18,8 @@ Gemini/others: re-invoke `prizehunter` per cycle). You handle blocks **directly*
 and **self-heal** the system; the user just watches. **You pick the right tool each tick yourself** — read the signal, choose the fitting `ph` verb unprompted (see CONTROL_PLANE "Autonomous tool selection"); the user never names a tool. Surface ONLY operator-gates
 (external-submit auth / account ToS / spend). Full protocol: `CONTROL_PLANE.md`.
 
+> Claude note: prefer `/goal "run prizehunter …"` (a Stop-hook keeps you working until done); `/loop 30m` also works for interval ticks.
+
 ## Front door: `ph` (learn ~12 verbs, not 40 tools)
 ```bash
 ./ph help     # the whole control surface
