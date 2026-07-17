@@ -26,6 +26,9 @@ fi
 gate "fresh-clone setup.sh" $? "$(grep -m1 -iE 'error|cannot|No such' "$WORK/setup.log" || true)"
 ( cd "$SMOKE" && bash ph next ) > "$WORK/next.log" 2>&1
 gate "ph next on fresh clone" $? "$(tail -1 "$WORK/next.log")"
+# Runtime import chain (py_compile can't catch a missing module — this can)
+( cd "$SMOKE" && python3 tools/goal_loop.py --board ) > "$WORK/goal.log" 2>&1
+gate "ph goal --board runs on fresh clone" $? "$(grep -m1 -E 'Error|Traceback' "$WORK/goal.log" || tail -1 "$WORK/goal.log")"
 
 # 2. Every tool parses (syntax)
 BROKEN=""
