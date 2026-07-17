@@ -1,0 +1,9 @@
+PrizeHunter
+Copyright 2026 The PrizeHunter Authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+The runtime core (the `ph` control surface, tools, and the competition/goal
+loop) is open source under Apache-2.0. Managed services offered on top of it
+(e.g. the Competition Integrity Preflight) are separate commercial offerings and
+are not part of this licensed Work.

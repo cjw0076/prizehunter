@@ -104,4 +104,6 @@ agents are first-class bug reporters here.
 
 ---
 
-Licensed for evaluation — see `LICENSE`.
+Open source under the **Apache License 2.0** — see `LICENSE` and `NOTICE`. The
+runtime core is free to use, modify, and redistribute; managed services (e.g. the
+Competition Integrity Preflight) are separate commercial offerings.
