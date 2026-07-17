@@ -74,5 +74,7 @@ tools/.session_*.json
 .session_*.json
 APPROACH_ONTOLOGY.tsv
 approach.ttl
+RND_EXPERIMENTS.tsv
+QA_TEAM_REPORT.md
 .runs/goal_*.json
 .runs/loopspec_*.json

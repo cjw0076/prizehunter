@@ -13,8 +13,12 @@ milestones on GitHub are the live sprint board; this file is the direction.
 - **1-week sprints.** Each sprint ships at least one user-visible improvement.
 - **Release gate**: `ph qa` must be green before any push (fresh-clone smoke,
   tool parse, trigger parity, seed files, secret scan).
-- **Council QA**: once per sprint, a heterogeneous panel of models (not the one
-  that wrote the code) reviews the increment; findings become `council` issues.
+- **QA team** (`ph qa-team`): once per sprint, a panel of role-specialized reviewers
+  (correctness / security / product / honesty), each on a different model, reviews the
+  increment; verified findings become issues. See [`RND.md`](RND.md).
+- **R&D loop** (`ph rnd`): findings + council + calibration feed an evolutionary
+  variation→selection→retention cycle on the system's own methods, scored on the
+  north-star metrics. The system improves itself, not just its throughput.
 - **Retro**: repeated lessons in `results/LESSONS.md` are treated as system bugs —
   fix the tool, not the reminder.
 

@@ -70,6 +70,8 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph council "<q>"       heterogeneous 2nd opinion (your codex/gemini/nim/ollama)
   ph issue "<title>"     file a GitHub issue (agent-native self-reporting)
   ph qa                  release gate: fresh-clone smoke + parse + secrets (run before push)
+  ph qa-team [--scope S] standing QA team: role-specialized reviewers (heterogeneous models)
+  ph rnd [board|propose|harvest|add|result|select]  evolutionary R&D on the system itself
   ph doctor              health-check the tools (find broken ones)
 EOF
     ;;
@@ -180,5 +182,7 @@ EOF
             echo "next → maintainer triages; set PH_ISSUE_REPO=owner/name to route" ;;
   doctor)   bash "$PH_HOME/ph_next.sh" --doctor 2>/dev/null || { echo "checking tools..."; for f in "$T"/*.sh; do bash -n "$f" 2>/dev/null || echo "  ❌ syntax: $(basename "$f")"; done; echo "done"; } ;;
   qa)       bash "$T/qa_harness.sh" "$@" ;;
+  qa-team)  bash "$T/qa_team.sh" "$@" ;;
+  rnd)      python3 "$T/rnd_loop.py" "$@" ;;
   *) echo "unknown verb: $v"; exec "$0" help ;;
 esac
