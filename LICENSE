@@ -1,0 +1,20 @@
+PrizeHunter Evaluation License
+
+Copyright (c) 2026 the PrizeHunter authors. All rights reserved.
+
+This source code is made available for EVALUATION: you may clone, read, run,
+and modify it for personal or internal evaluation and research, and file
+issues or pull requests against it.
+
+It is NOT (yet) an open-source license: redistribution, commercial use, or
+offering it as a service requires prior written permission from the authors.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM THE
+USE OF THE SOFTWARE.
+
+Note: the license model is under active review (candidate: Apache-2.0 for the
+runtime core). Track the decision at
+https://github.com/cjw0076/prizehunter/issues
