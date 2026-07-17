@@ -62,6 +62,7 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph autonomy             self-check: what runs unattended vs what to fill
   ph onboard [gate]       ask for ONLY the credential a gate needs, then resume
   ph session --site <s>   log in once → agent extracts API token from browser → vault
+  ph browser <open|click|accept|form> …   handle a WEB gate directly (rules accept, form) — not an operator gate
   ph vault KEY VALUE      store one supplied credential (gitignored)
   ph ontology             build the approach/context ontology from finished competitions
   ph inherit <key|-m M>   inherit+evolve approaches for a new competition (from ontology)
@@ -184,5 +185,6 @@ EOF
   qa)       bash "$T/qa_harness.sh" "$@" ;;
   qa-team)  bash "$T/qa_team.sh" "$@" ;;
   rnd)      python3 "$T/rnd_loop.py" "$@" ;;
+  browser)  python3 "$T/browser_gate.py" "$@" ;;
   *) echo "unknown verb: $v"; exec "$0" help ;;
 esac

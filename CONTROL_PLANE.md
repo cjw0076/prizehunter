@@ -65,6 +65,7 @@ map (and compose freely; `ph help` is the full surface, `ph next` is the mechani
 | a keystone call (which submission, strategy, a ceiling/impossibility claim) | `ph council "…"` — get a heterogeneous read BEFORE accepting; same-weights = fake consensus |
 | the approach feels stale / ideas exhausted | `ph creative "<topic>"` (wild framings before building) |
 | a credential / web-login gate blocks the task | `ph onboard <gate>` → `ph vault` / `ph session --site <s>` (turn a login into a token) |
+| a WEB gate blocks you — accept competition rules, click Join, submit a contact form, upload a file | `ph browser <open\|click\|accept\|form> <url> …` — **handle it directly with Browser Use.** A logged-in web click is NOT an operator gate. |
 | you need another agent's capability | `ph route "<need>"` → `ph dispatch <agent> "<task>"` |
 | a competition resolved / results are out | `ph results` → `ph settle close <key> …` → `ph ontology` (learn) → `ph calibrate` |
 | a tool/stage errored and you couldn't self-heal it | `ph issue "<title>"` (file it) |
@@ -75,11 +76,30 @@ state, open gates, pending results, blocked workers) and select + run the fittin
 tool on your own. An explicit human instruction is only ever an override, not the
 normal path. This is what "hands-off" means: the operator watches; you orchestrate.
 
+## Browser Use — a web gate is NOT an operator gate
+
+If a task is blocked by a *logged-in web action* — accepting competition rules,
+clicking "Join", ticking a consent box, filling a contact form, uploading a file —
+**do it yourself with `ph browser`**, don't surface it. It drives a persistent
+browser profile that carries the operator's existing logins (set `PH_BROWSER_PROFILE`
+to that profile once; log in there a single time). Examples:
+
+```
+ph browser open   https://<platform>/competitions/<c>/rules     # see the page + buttons + login state
+ph browser accept https://<platform>/competitions/<c>/rules     # Join → I Understand and Accept (rules)
+ph browser form   https://<host>/contact name="…" email="…" message="…" --submit "Send"
+```
+
+The line that separates "do it in the browser" from "surface it": a click inside an
+*already logged-in* session is yours to make. Creating a NEW account, spending money,
+or sending a *cold outbound message to a third party* stays an operator gate (below).
+
 ## The ONLY things surfaced to the human (operator-gates)
 
-Irreducible, outward-facing, or PII/spend: external-platform submission auth,
-account signup / ToS acceptance, real-money spend approval. Surface each as one
-line, then keep working everything else. Nothing else interrupts the automation.
+Irreducible and truly outward/PII/spend: **new-account signup**, **real-money spend**,
+and **cold outbound to third parties** (email/DM/form to someone who didn't ask).
+Accepting rules or clicking Join on an existing logged-in account is NOT here — that's
+`ph browser`. Surface a real gate as one line, then keep working everything else.
 
 ### Submission-confirm protocol (standard)
 
