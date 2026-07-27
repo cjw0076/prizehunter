@@ -50,6 +50,7 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph gap <key> "<name>"  mine judge intent, our gaps, and 120% backlog
   ph tick                record + refresh + flywheel deposit (the heartbeat)
   ph sync                push board state to the hosted control-plane (Supabase → web dashboard)
+  ph sandbox -- CMD…     run agent-generated code in the container sandbox (no net, non-root)
   ph radar               deadline radar: D-day board + 마감경과 자동 아카이브 리포트
   ph pnl                 P&L: registry→prize ledger 동기화 + 비용(EXIT/COSTS.tsv) 합산 요약
   ph settle [close <key> …]  '끝난 후' 정산: 결과 radar / 결과확정→포스트모템→포트폴리오 (playbook/POSTERIOR.md)
@@ -244,5 +245,6 @@ EOF
   rnd)      python3 "$T/rnd_loop.py" "$@" ;;
   browser)  python3 "$T/browser_gate.py" "$@" ;;
   sync)     python3 "$T/dashboard_sync.py" "$@" ;;
+  sandbox)  bash "$T/sandbox_run.sh" "$@" ;;
   *) echo "unknown verb: $v"; exec "$0" help ;;
 esac

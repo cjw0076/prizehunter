@@ -22,6 +22,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -210,6 +211,9 @@ def main():
     ap.add_argument("--design", metavar="KEY")
     ap.add_argument("--board", action="store_true")
     a = ap.parse_args()
+    # disk guard: --board/--record are read-only, but a --key drive starts new work
+    if a.key and subprocess.call(["bash", os.path.join(HERE, "disk_guard.sh")]) != 0:
+        sys.exit(3)
     rows = P.parse_registry(with_extras=False)
     if a.design:
         r = next((x for x in rows if x["key"] == a.design), None)

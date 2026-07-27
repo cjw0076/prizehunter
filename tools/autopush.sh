@@ -15,6 +15,8 @@ set -uo pipefail
 CT="$(cd -- "$(dirname "$0")/.." && pwd)"
 # multi-tenant: every state path is env-overridable so one daemon can serve isolated tenants
 R="${PH_RUNS:-$CT/.runs}"; mkdir -p "$R"
+# refuse to start a NEW push cycle under disk pressure (disk_guard prints why)
+bash "$CT/tools/disk_guard.sh" || exit 3
 BOARD="${PH_BOARD:-$R/autopush_board.tsv}"; WF="${PH_WORKERS:-$R/fleet_workers.tsv}"
 ROOT="$(cd "$CT/.." && pwd)"; cd "$ROOT" || exit 1
 touch "$BOARD" "$WF"
