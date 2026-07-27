@@ -86,7 +86,8 @@ if [ ! -f "$D" ]; then no "daemon missing"; else
   sleep 5; DPID="$(cat "$TMP/pid" 2>/dev/null || true)"
   TOK="$(grep -oE '\?t=[A-Za-z0-9_-]+' "$TMP/daemon.log" 2>/dev/null | head -1 | cut -d= -f2)"
   [ -n "$TOK" ] && ok "daemon started and minted a token" || no "daemon did not start/mint a token (see daemon.log)"
-  tf="$CT/.runs/cockpit_token"; [ -f "$tf" ] && [ "$(stat -c %a "$tf" 2>/dev/null)" = "600" ] && ok "token file is 0600" || no "token file permissions are not 0600"
+  # the daemon honors PH_RUNS — check the token where THIS run minted it, not the repo default
+  tf="$TMP/runs/cockpit_token"; [ -f "$tf" ] && [ "$(stat -c %a "$tf" 2>/dev/null)" = "600" ] && ok "token file is 0600" || no "token file permissions are not 0600"
   code="$(timeout 15 curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1:$PORT/api/state" 2>/dev/null || echo 000)"
   [ "$code" = "401" ] && ok "unauthenticated /api/state is refused (401)" || no "unauthenticated request returned $code — the cockpit must never be open"
   if [ -n "$TOK" ]; then

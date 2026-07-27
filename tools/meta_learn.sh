@@ -16,7 +16,7 @@
 set -uo pipefail
 CT="$(cd -- "$(dirname "$0")/.." && pwd)"; R="${PH_RUNS:-$CT/.runs}"
 PLOG="${PH_PLOG:-$CT/PROCESS_LOG.tsv}"; BOARD="${PH_BOARD:-$R/autopush_board.tsv}"
-touch "$PLOG"
+mkdir -p "$R"; touch "$PLOG" "$BOARD"   # fresh install: state files may not exist yet
 PY=python3
 
 case "${1:-report}" in

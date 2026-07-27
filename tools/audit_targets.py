@@ -28,6 +28,8 @@ NUMIN = re.compile(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
 
 def columns():
     cols = []
+    if not os.path.exists(REG):
+        return cols  # fresh install: no registry yet — an empty board, not a crash
     for l in open(REG):
         if l.startswith("#   ") and l[4:5].isalpha() and len(l.split()) > 1:
             cols.append(l.split()[1])
@@ -39,6 +41,8 @@ def columns():
 def rows():
     cols = columns()
     out = []
+    if not os.path.exists(REG):
+        return cols, out
     for l in open(REG):
         if l.startswith("#") or not l.strip():
             continue

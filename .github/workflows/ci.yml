@@ -1,0 +1,28 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  qa:
+    # the same 8-gate release harness that gates local pushes (ph qa)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: ph qa (fresh-clone smoke, parse, verb→tool, secrets)
+        run: bash tools/qa_harness.sh
+
+  docker-smoke:
+    # proves the container story end-to-end: image builds, engine boots inside it,
+    # cockpit daemon mints a token and refuses unauthenticated requests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: build image
+        run: docker build -t prizehunter:ci .
+      - name: smoke inside container
+        run: docker run --rm prizehunter:ci smoke

@@ -1,0 +1,39 @@
+# PrizeHunter — hosted-control-plane + local-worker shape (council decision 2026-07-26).
+# Compute and data stay on YOUR machine; the repo directory is bind-mounted so state
+# lives in plain files you own. Upgrade = git pull. Secrets stay in gitignored env files.
+#
+#   docker compose run --rm worker doctor      # health check
+#   docker compose run --rm worker smoke       # fresh-install smoke test
+#   docker compose up cockpit                  # web cockpit on 127.0.0.1:8787 (tokened)
+#
+# The worker runs non-root inside the container with the default seccomp profile —
+# this is the minimum sandbox for agent-generated campaign code. Do not weaken it.
+services:
+  worker:
+    build: .
+    image: prizehunter:local
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - PH_DOCKER=1
+      - HOME=/tmp
+    entrypoint: ["/app/ph"]
+    command: ["doctor"]
+
+  cockpit:
+    build: .
+    image: prizehunter:local
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /app
+    volumes:
+      - .:/app
+    environment:
+      - PH_DOCKER=1
+      - HOME=/tmp
+    entrypoint: ["python3", "tools/prizehunterd.py"]
+    command: ["--port", "8787"]
+    ports:
+      # localhost only — the cockpit can trigger drives; never publish it to 0.0.0.0
+      - "127.0.0.1:8787:8787"

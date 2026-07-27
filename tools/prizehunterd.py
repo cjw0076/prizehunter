@@ -21,7 +21,8 @@ import argparse, hashlib, hmac, html, http.cookies, json, os, re, secrets, shuti
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 CT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-R = os.path.join(CT, ".runs")
+R = os.environ.get("PH_RUNS") or os.path.join(CT, ".runs")
+os.makedirs(R, exist_ok=True)  # fresh install has no .runs yet; token minting must not crash
 BOARD = os.path.join(R, "autopush_board.tsv")
 WORKERS = os.path.join(R, "fleet_workers.tsv")
 LIB = os.path.join(CT, "LEVER_LIBRARY.tsv")

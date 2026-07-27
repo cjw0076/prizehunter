@@ -28,7 +28,7 @@ now(){ date -u +%FT%TZ 2>/dev/null || echo "unknown"; }
 # add a line to section "## STEER:<scope>", creating the section if absent
 add(){
   local scope="$1" text="$2" ts; ts="$(now)"
-  [ -f "$BANK" ] || { echo "⛔ BRIEF_BANK not found: $BANK"; return 1; }
+  [ -f "$BANK" ] || printf '# BRIEF_BANK — drive briefs + steers (created on first steer)\n' > "$BANK"
   case "$text" in *$'\n'*) echo "⛔ steer must be ONE line"; return 1;; esac
   if ! grep -q "^## STEER:$scope\$" "$BANK"; then
     printf '\n## STEER:%s\n' "$scope" >> "$BANK"

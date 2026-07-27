@@ -1,0 +1,24 @@
+.git
+.github
+# instance data never bakes into an image (mirrors .gitignore)
+campaigns/
+session_corpus/
+receipts/
+aios_outbox/
+EXIT/
+context/
+sleep/
+.runs/
+*.env
+.vault/
+vault/
+**/dispatch_log/
+**/failure_reports/
+**/portfolio_registry.tsv
+__pycache__/
+*.pyc
+*.log
+node_modules/
+.next/
+.omc/
+.claude/
