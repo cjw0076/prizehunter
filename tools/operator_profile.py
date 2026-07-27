@@ -172,8 +172,8 @@ def build_profile(workspace: Path) -> dict[str, Any]:
             "confidence": "high",
         },
         {
-            "claim": "The operator runs a multi-competition portfolio, not one-off contests.",
-            "evidence": sorted(repo_names)[:5],
+            "claim": "The operator is building an AIOS-style multi-agent operating system, not only solving one-off contests.",
+            "evidence": [name for name in ["myworld", "prizehunter", "dacon"] if name in repo_names] + ["MemoryOS/AIOS references in control_tower docs"],
             "confidence": "high",
         },
         {

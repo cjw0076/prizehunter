@@ -17,8 +17,8 @@ MATRIX = [
         "platform": "DACON API",
         "level": "A5 for delegated daily leaderboard submits",
         "implemented": "yes",
-        "paths": "campaigns/<key>/submit.sh (your per-competition submit script)",
-        "evidence": "campaigns/<key>/artifacts/submission_log.jsonl",
+        "paths": "aibias/submit_236722.sh; aibias/auto_submit_at_reset_236722.sh; etri/src/dacon_submit.py; etri/scripts/dacon_submit_cycle.py",
+        "evidence": "aibias/artifacts/dacon_submit_*.json; etri/artifacts/dacon_submit_*.json",
         "gap": "Needs valid token/team/contest permission; final/private pick still requires strategy discipline.",
     },
     {

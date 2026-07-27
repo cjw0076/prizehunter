@@ -46,11 +46,23 @@ EXPLICIT_GATE_RE = re.compile(
 )
 
 
-# Empty in the shipped product. Per-competition operator instructions are read
-# from the registry instead: put a `FOUNDER:`-prefixed note in a row's `blocker`
-# or `next_lever` and it flows through as the request / retry_or_operator_action
-# (see build_rows). Add entries here only to pin a custom retry command per key.
-KNOWN_RETRY: dict[str, str] = {}
+KNOWN_RETRY: dict[str, str] = {
+    "arc-whitebox-2026": (
+        "Join/register/accept rules for arc-white-box-estimation-challenge-2026 in AIcrowd, "
+        "then run competitions/control_tower/campaigns/arc-whitebox-2026/tools/submit_with_saved_aicrowd_key.sh"
+    ),
+    "qwen": "Open Devpost manage page for Qwen Cloud Hackathon, review Official Rules/ToS, then authorize final submit.",
+    "datacontest-motie": "Run the real operator/founder walkthrough, then record it with tools/record_walkthrough.py.",
+    "2026-create-the-future": "Use official Create the Future account/form; confirm IP/originality warranty before upload.",
+    "aic-usecase": "Founder personally reviews/uses prototype, confirms AIC category/prior-award status, then handles portal identity/consent/upload.",
+    "236730": "Founder completes personal DACON/Samsung AI Challenge registration before 2026-07-05.",
+    "236727": "Founder completes DACON participation registration when contest opens; agents build after data release.",
+    "zindi-worldcup-2026": "Authenticate/join Zindi and download official files; do not substitute external data.",
+    "neurogolf-2026": "Accept/join Kaggle rules only with standing delegation, then download task utilities.",
+    "kdd-unirec-2026": "Use authenticated/eligible account to verify registration, team, full-data, and submission access.",
+    "adia-structural-break-rt": "Provide platform setup token/session for crunch-cli official tester.",
+    "numerai-main": "Run no-stake full-data baseline and benchmark exposure checks; only later provide Numerai API/model id for upload, and separately approve any NMR stake.",
+}
 
 
 def now_kst() -> str:
@@ -175,6 +187,14 @@ def build_rows() -> list[dict[str, str]]:
 
 
 def _safe_agent_work(key: str, row: dict[str, str], q: dict[str, str]) -> str:
+    if key == "arc-whitebox-2026":
+        return "Continue estimator research and packaging; do not call it submitted until AIcrowd id/receipt exists. API key is local; registration is the current gate."
+    if key == "datacontest-motie":
+        return "Keep package/support-program evidence fresh; agents cannot fake real operator walkthrough."
+    if key == "qwen":
+        return "Can re-open Devpost draft and save non-final fields; stop before final submit without explicit consent."
+    if key == "numerai-main":
+        return "Continue no-stake API/data/model validation; do not upload or stake until account and spend-risk gates are recorded."
     if row.get("status") == "blocked":
         return "Record exact gate class and work another contest unless credentials/session are available."
     return q.get("strategy_gaps") or "Prepare package/checklists; leave irreversible action to founder/auth gate."

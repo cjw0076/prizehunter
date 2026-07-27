@@ -20,15 +20,85 @@ OUT_TSV = CONTROL / "NOVELTY_VALUE_BOARD.tsv"
 
 ACTIVE_STATUSES = {"active", "submitted", "ceiling", "ready-gate", "blocked", "recon", "scaffold"}
 
-# Seed data intentionally left empty for the shipped product. Lanes and novelty
-# theses are derived per-row from portfolio_registry.tsv (see lane_for /
-# default_novelty). Populate these with your own competitions if you want to pin
-# specific overrides, e.g. LANE_OVERRIDES = {"example-comp": "leaderboard"}.
-LEADERBOARD_KEYS: set[str] = set()
+LEADERBOARD_KEYS = {
+    "236722",
+    "236690",
+    "kdd-unirec-2026",
+    "adia-structural-break-rt",
+    "arc-whitebox-2026",
+    "neurogolf-2026",
+    "crunchdao-obesity-3",
+    "numerai-main",
+    "zindi-worldcup-2026",
+    "nexon-nypc-2026",
+    "arc-prize-2026",
+    "orbit-wars",
+    "236730",
+    "236727",
+}
 
-LANE_OVERRIDES: dict[str, str] = {}
+LANE_OVERRIDES = {
+    "arc-whitebox-2026": "leaderboard",
+    "arc-prize-2026": "leaderboard",
+    "numerai-main": "leaderboard",
+    "nexon-nypc-2026": "leaderboard",
+    "datacontest-motie": "publicdata_product",
+    "gitlab-transcend-2026": "hackathon",
+    "aic-culture-data": "publicdata_product",
+    "aic-usecase": "hackathon",
+    "2026-create-the-future": "idea_design",
+}
 
-NOVELTY_OVERRIDES: dict[str, dict[str, str]] = {}
+NOVELTY_OVERRIDES = {
+    "arc-whitebox-2026": {
+        "thesis": "Beat tutorial covariance/MC by deriving a stronger ReLU covariance estimator, not by spending more samples.",
+        "proof": "Mini/full split improvement over 1.7494e-06, residual family report, subprocess validation, then gated AIcrowd submit.",
+        "risk": "fixed covariance+MC blend is now leaderboard-middle and visually indistinguishable from common baseline tuning",
+        "next": "Implement or test exact/bivariate ReLU covariance and antithetic variance-reduction probes.",
+    },
+    "arc-prize-2026": {
+        "thesis": "Turn public game internals into per-game solvers and reusable action-effect memory, not blind ARC-AGI prompting.",
+        "proof": "At least one public game solved locally with replay/trace and generalized action-effect notes before upload.",
+        "risk": "random/deterministic sweeps and generic LLM planning are already exhausted and score 0.0",
+        "next": "Solve ft09 with a public-state oracle/constraint reducer, then generalize to r11l/tr87 planners.",
+    },
+    "numerai-main": {
+        "thesis": "Find a stable orthogonal signal family under era/exposure checks, not another public example-pred blend.",
+        "proof": "Feature-family or model-class variation improves mean without severe sharpe/exposure degradation; no-stake validation only.",
+        "risk": "small+wisdom rank ensembles are incremental and likely not prize-distinct",
+        "next": "Run one compact family/model-class confirmation and keep upload gated until robustness improves.",
+    },
+    "nexon-nypc-2026": {
+        "thesis": "Build a reusable private arena/opponent suite that converts hidden agent behavior into policy search assets.",
+        "proof": "Official runner adapter plus opponent suite scorecard after founder provides Arena/practice assets.",
+        "risk": "toy arena alone is preparation, not a contest advantage",
+        "next": "After access, replace toy runner with official adapter and rerun deterministic scorecard.",
+    },
+    "datacontest-motie": {
+        "thesis": "Sell an operator-validated energy support decision system, not a public-data dashboard.",
+        "proof": "Real founder/operator walkthrough row, freshness check, impact math tied to actual support-program action.",
+        "risk": "thin dashboard/reskin will look like every public-data contest entry",
+        "next": "Run one real walkthrough and record objections/changes with the existing recorder.",
+    },
+    "gitlab-transcend-2026": {
+        "thesis": "Use live Orbit graph context as a merge guardrail and AI Catalog asset, not a generic MR summarizer.",
+        "proof": "glab Orbit live receipt, schema/query output, AI Catalog URL, failing/passing guardrail demo.",
+        "risk": "offline mock data reads as a demo scaffold and loses theme eligibility",
+        "next": "Unlock live Orbit/glab auth or park rather than polishing sample JSON.",
+    },
+    "orbit-wars": {
+        "thesis": "Only revive with a live-transfer simulator/opponent generator, not another heuristic tweak.",
+        "proof": "Local proxy predicts live score movement across archived bots before spending a Kaggle submit.",
+        "risk": "garrison gates overfit; v12 already failed live transfer",
+        "next": "Park unless broader proxy/MCTS-like opponent generator is built.",
+    },
+    "aic-culture-data": {
+        "thesis": "HanMoon must be a distinct cross-track cultural-data product with written eligibility clearance.",
+        "proof": "Organizer confirms dual-work submission is allowed; then evidence-backed demo/video can proceed.",
+        "risk": "duplicate-entry ambiguity can disqualify even a strong product",
+        "next": "Obtain written organizer confirmation before any external submission polish.",
+    },
+}
 
 
 def read_tsv(path: Path) -> list[dict[str, str]]:

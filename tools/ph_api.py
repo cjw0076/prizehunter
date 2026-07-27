@@ -2,7 +2,7 @@
 """Small Prizehunter REST client for agents.
 
 Environment:
-  PH_API_BASE_URL  Deployment origin of your prizehunter-web endpoint (required).
+  PH_API_BASE_URL  Deployment origin, defaults to the Cloudflare Worker URL.
   PH_API_KEY       Sent as x-ph-key for agent read/write endpoints.
 """
 
@@ -17,7 +17,7 @@ import urllib.request
 from typing import Any
 
 
-DEFAULT_BASE_URL = ""  # set PH_API_BASE_URL to your deployed prizehunter-web endpoint
+DEFAULT_BASE_URL = "https://prizehunter.cjw070690.workers.dev"
 
 
 class PrizehunterApiError(RuntimeError):
@@ -31,6 +31,21 @@ def base_url() -> str:
     return os.environ.get("PH_API_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
 
 
+def _key_from_config() -> str | None:
+    # `ph api` and cron call this client without sourcing the env file first,
+    # which silently downgraded every agent read to anonymous 401.
+    cfg = os.path.expanduser("~/.config/prizehunter/ph_api.env")
+    try:
+        with open(cfg, encoding="utf-8") as fh:
+            for line in fh:
+                line = line.strip()
+                if line.startswith("PH_API_KEY="):
+                    return line.split("=", 1)[1].strip() or None
+    except OSError:
+        return None
+    return None
+
+
 def request(method: str, path: str, payload: dict[str, Any] | None = None) -> Any:
     path = path if path.startswith("/") else f"/api/{path.lstrip('/')}"
     if not path.startswith("/api/"):
@@ -40,7 +55,7 @@ def request(method: str, path: str, payload: dict[str, Any] | None = None) -> An
         "Accept": "application/json",
         "User-Agent": "prizehunter-agent/1.0",
     }
-    api_key = os.environ.get("PH_API_KEY")
+    api_key = os.environ.get("PH_API_KEY") or _key_from_config()
     if api_key:
         headers["x-ph-key"] = api_key
 

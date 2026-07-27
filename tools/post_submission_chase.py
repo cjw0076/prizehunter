@@ -12,10 +12,20 @@ REGISTRY = CONTROL / "portfolio_registry.tsv"
 QUALITY = CONTROL / "QUALITY_GATE_REPORT.tsv"
 OUT = CONTROL / "POST_SUBMISSION_CHASE_BOARD.md"
 
-# Empty in the shipped product: leaderboard lane is inferred per-row from the
-# registry (any row with direction "max"/"min" counts as a leaderboard chase —
-# see infer_lane). Add your own keys here only to force-classify edge cases.
-LEADERBOARD_KEYS: set[str] = set()
+LEADERBOARD_KEYS = {
+    "236722",
+    "236690",
+    "kdd-unirec-2026",
+    "adia-structural-break-rt",
+    "arc-whitebox-2026",
+    "neurogolf-2026",
+    "crunchdao-obesity-3",
+    "numerai-main",
+    "zindi-worldcup-2026",
+    "nexon-nypc-2026",
+    "arc-prize-2026",
+    "orbit-wars",
+}
 
 
 def read_tsv(path: Path) -> list[dict[str, str]]:

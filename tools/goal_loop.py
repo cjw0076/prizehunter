@@ -148,13 +148,22 @@ def design(r):
     print("   The verdict (ph goal <key>) then drives THIS designed loop, not a generic one.")
 
 
-def stalled(history, direction):
-    if len(history) < STALL_CYCLES:
-        return False
-    recent = [h["best"] for h in history[-STALL_CYCLES:]]
-    b0 = recent[0] or 1e-9
-    return max((abs(x - b0) / (abs(b0) or 1e-9)) for x in recent) < REL_EPS
+def stall_level(history):
+    if len(history) < 3:
+        return 0
+    
+    if len(history) >= 5:
+        recent5 = [h["best"] for h in history[-5:]]
+        b0_5 = recent5[0] or 1e-9
+        if max((abs(x - b0_5) / (abs(b0_5) or 1e-9)) for x in recent5) < REL_EPS:
+            return 2 # HARD_PIVOT
 
+    recent3 = [h["best"] for h in history[-3:]]
+    b0_3 = recent3[0] or 1e-9
+    if max((abs(x - b0_3) / (abs(b0_3) or 1e-9)) for x in recent3) < REL_EPS:
+        return 1 # REFUTE
+        
+    return 0
 
 def next_lever(r):
     spec = load_spec(r["key"])
@@ -183,11 +192,16 @@ def verdict(r, record=None):
     g = (r1 - b) if d == "max" else (b - r1)
     if g <= 0:
         return "AT_#1", f"{key}: best {b} vs rank1 {r1} → AT/ABOVE #1. Bank (ph settle close) + ph ontology, move on."
-    if stalled(st.get("history", []), d):
-        ct = (load_spec(key) or ARCHETYPES[arch]).get("ceiling_test", "stalled")
-        return "CEILING?", (f"{key}: gap {g:.4g} but stalled. Do NOT stop — verify: {ct}. "
-                            f"ph council \"honest ceiling or luck-mining on {key}?\" + check live LB.")
-    return "PUSH", f"{key}: gap {g:.4g} to #1 ({r.get('metric')}). {next_lever(r)}"
+    
+    sl = stall_level(st.get("history", []))
+    if sl == 2:
+        return "HARD_PIVOT", (f"{key}: stalled for 5 cycles (gap {g:.4g}). "
+                              f"Triggering HARD_PIVOT: discard current architecture/features, use failure memory, start clean-slate.")
+    elif sl == 1:
+        return "REFUTE", (f"{key}: stalled for 3 cycles (gap {g:.4g}). "
+                          f"Triggering REFUTATION: dispatch side-agent to attack current approach and find radical alternatives.")
+
+    return "PUSH", f"{key}: gap {g:.4g} to #1 ({r.get('metric')}). [EV-check: is this the highest ROI use of a submission slot?] {next_lever(r)}"
 
 
 def main():

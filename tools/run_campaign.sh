@@ -35,7 +35,7 @@ echo "== run_campaign [$mode] : $NAME =="
 # RECALL accumulated expertise from MemoryOS -> the agent starts as an expert (flywheel).
 EXP="$CAMP/EXPERTISE.md"
 "$CONTROL/tools/memoryos_bridge.sh" recall --task "$NAME $DOM competition leaderboard honest CV" >"$EXP" 2>/dev/null \
-  && echo "  expertise recalled -> $EXP ($(grep -c '^- ' "$EXP" 2>/dev/null || echo 0) items)" \
+  && echo "  expertise recalled -> $EXP ($(grep -c '^- ' "$EXP" 2>/dev/null | head -1) items)" \
   || echo "  (MemoryOS recall unavailable; proceeding without priming)"
 
 # emit (phase, subobj_id, route, task) tuples, optionally filtered to one phase

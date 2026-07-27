@@ -78,3 +78,8 @@ RND_EXPERIMENTS.tsv
 QA_TEAM_REPORT.md
 .runs/goal_*.json
 .runs/loopspec_*.json
+
+# instance data must never ship (any depth)
+**/dispatch_log/
+**/failure_reports/
+**/portfolio_registry.tsv

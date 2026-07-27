@@ -56,7 +56,7 @@ Recommended use:
 - Otherwise store `password_manager_item` names and keep the real secret in a
   password manager.
 - Keep screenshots, receipt ids, and non-secret confirmation steps in the repo
-  runbook: `control_tower/SUBMISSION_CONFIRMATION_RUNBOOK.md`.
+  runbook: `<CT>/SUBMISSION_CONFIRMATION_RUNBOOK.md` (repo-relative).
 
 ## Portal Entries
 
@@ -148,7 +148,7 @@ Recommended use:
 
 ### DACON
 
-- purpose: <competition key> score and submission monitoring
+- purpose: 236722 / 236690 score and submission monitoring
 - login_url: `https://dacon.io/`
 - account_id:
 - password_manager_item:

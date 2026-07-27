@@ -127,12 +127,60 @@ STRATEGY_CHECKS = {
 }
 
 
-MANUAL_OVERRIDES: dict[str, dict] = {}  # per-competition manual gate overrides; populate for your own comps
+MANUAL_OVERRIDES = {
+    "aic-culture-data": {
+        "lane": "publicdata_product",
+        "submission_readiness": 55,
+        "judge_quality": 45,
+        "win_probability": 20,
+        "ev_stance": "BLOCKED: public rules say duplicate entry is not allowed until organizer confirms otherwise.",
+        "forced_findings": [
+            "Same umbrella as MOCT; public materials say duplicate entry is not allowed and no public exception was found.",
+            "Browser demo claim corrected: it searches a 60-record sample, while the full corpus remains proposal/offline evidence.",
+            "Official signed forms and public-demo approval remain founder-gated.",
+        ],
+        "next_gate": "Send organizer inquiry draft and obtain written confirmation before any HanMoon external submission.",
+    },
+    "datacontest-motie": {
+        "lane": "publicdata_product",
+        "submission_readiness": 72,
+        "judge_quality": 60,
+        "win_probability": 42,
+        "ev_stance": "MEDIUM-HIGH: continue if runnable package + real validation are added.",
+        "forced_findings": [
+            "Latest package includes runnable offline demo/source and methodology appendix; next proof is real validation, not more zipping.",
+            "Benefit math now separates guaranteed cash, conservative/base modeled savings, and support opportunity cap.",
+            "Proxy validation is not real user validation.",
+        ],
+        "next_gate": "Run one real operator/founder walkthrough and record it with tools/record_walkthrough.py.",
+    },
+    "wevity-busan-pubdata": {
+        "lane": "publicdata_product",
+        "submission_readiness": 58,
+        "judge_quality": 34,
+        "win_probability": 18,
+        "ev_stance": "LOW: park unless founder explicitly wants Busan/local track.",
+        "forced_findings": [
+            "Email-only submission is now encoded; final official HWP/PDF/email packet is still founder-gated.",
+            "Default scenario has weak cash-impact evidence and reads like a reskin.",
+            "Local eligibility/offline presentation burden is high relative to prize.",
+        ],
+        "next_gate": "Park by default; if GO, build a high-impact Busan-local scenario.",
+    },
+}
 
-# Empty in the shipped product: lanes are inferred from LANE_PATTERNS against the
-# registry row (see lane_for). Add your own keys here only to pin a lane, e.g.
-# LANE_OVERRIDES = {"example-comp": "leaderboard"}.
-LANE_OVERRIDES: dict[str, str] = {}
+LANE_OVERRIDES = {
+    "aic-09-culture-ai": "publicdata_product",
+    "2026-create-the-future": "idea_design",
+    "kdd-unirec-2026": "leaderboard",
+    "adia-structural-break-rt": "leaderboard",
+    "arc-whitebox-2026": "leaderboard",
+    "neurogolf-2026": "leaderboard",
+    "crunchdao-obesity-3": "leaderboard",
+    "numerai-main": "leaderboard",
+    "zindi-worldcup-2026": "leaderboard",
+    "nexon-nypc-2026": "leaderboard",
+}
 
 
 def read_tsv(path: Path) -> list[dict[str, str]]:
@@ -356,6 +404,14 @@ def build_rows() -> list[dict[str, str]]:
             ev = ov["ev_stance"]
             findings = ov["forced_findings"] + [f for f in findings if f not in ov["forced_findings"]]
             next_gate = ov["next_gate"]
+            if key == "datacontest-motie" and has_real_walkthrough(campdir):
+                judge_quality = max(judge_quality, 68)
+                winp = max(winp, 47)
+                findings = [
+                    "Real walkthrough gate has at least one usable row.",
+                    "Keep support-program freshness checks within 72 hours of final submission.",
+                ] + [f for f in findings if "Proxy validation" not in f]
+                next_gate = "Run support-program 72h freshness check, then founder handles datacontest.kr ToS/form/final submit."
         else:
             strategy = STRATEGIES[lane]
             next_gate = r.get("next_lever") or strategy["proof"]

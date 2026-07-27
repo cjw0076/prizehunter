@@ -74,10 +74,17 @@ LANE_PATTERNS = {
     "idea_design": r"아이디어|기획|invention|design|제안|future|techbriefs",
 }
 
-# Empty in the shipped product: lanes are inferred from LANE_PATTERNS against the
-# registry row (see lane_for). Add your own keys here only to pin a lane, e.g.
-# LANE_OVERRIDES = {"example-comp": "leaderboard"}.
-LANE_OVERRIDES: dict[str, str] = {}
+LANE_OVERRIDES = {
+    "2026-create-the-future": "idea_design",
+    "kdd-unirec-2026": "leaderboard",
+    "adia-structural-break-rt": "leaderboard",
+    "arc-whitebox-2026": "leaderboard",
+    "neurogolf-2026": "leaderboard",
+    "crunchdao-obesity-3": "leaderboard",
+    "numerai-main": "leaderboard",
+    "zindi-worldcup-2026": "leaderboard",
+    "nexon-nypc-2026": "leaderboard",
+}
 
 
 def read_registry() -> list[dict[str, str]]:

@@ -49,9 +49,10 @@ def refuse_secrets(*values: str) -> None:
 
 
 def default_target() -> Path | None:
-    env = os.environ.get("PH_TEAM_TARGET")
+    env = os.environ.get("KEVIN_DACON_REPO")
     candidates = [
         Path(env).expanduser() if env else None,
+        Path("/tmp/kevin8738-dacon"),
         ROOT.parent / "Dacon",
         ROOT.parent / "dacon-dashboard",
     ]
@@ -64,7 +65,7 @@ def default_target() -> Path | None:
 def target_from(args: argparse.Namespace) -> Path:
     target = Path(args.target).expanduser().resolve() if args.target else default_target()
     if not target:
-        raise SystemExit("No team dashboard checkout found. Set PH_TEAM_TARGET=/path/to/dashboard.")
+        raise SystemExit("No Kevin dashboard checkout found. Clone it or set KEVIN_DACON_REPO=/path/to/Dacon.")
     return target
 
 
@@ -173,7 +174,7 @@ def cmd_init(args: argparse.Namespace) -> int:
         )
         print(path)
     print(TEAM_DOC)
-    print("next -> ph team onboard/checkin/review/idea")
+    print("next -> ph team onboard/checkin/review/idea, then ph kevin --build")
     return 0
 
 
@@ -226,7 +227,7 @@ def cmd_onboard(args: argparse.Namespace) -> int:
     )
     print(ROSTER)
     print(path)
-    print("next -> ph team review")
+    print("next -> ph kevin --target <Dacon> --build")
     return 0
 
 
@@ -315,7 +316,7 @@ def cmd_message(args: argparse.Namespace) -> int:
         body=args.body,
     )
     print(path)
-    print("next -> commit/push in your team dashboard repo")
+    print("next -> ph kevin --build, then git diff/commit/push in the Kevin dashboard repo")
     return 0
 
 

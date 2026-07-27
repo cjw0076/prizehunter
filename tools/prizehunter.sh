@@ -20,7 +20,8 @@ echo "self-heal the system. Surface to the human ONLY irreducible founder-gates"
 echo "(external-submit auth / account ToS / explicit spend). Everything else: act."
 echo
 echo "── FOUNDER REQUESTS + REVIEW QUEUE (process before anything else) ─"
-pending=$(grep -c "^\## \[pending\]" "$PH_HOME/founder_requests.md" 2>/dev/null || echo 0)
+pending=$(grep -c "^\## \[pending\]" "$PH_HOME/founder_requests.md" 2>/dev/null; true)
+pending=$(printf '%s' "${pending:-0}" | head -1)
 if [ "$pending" -gt 0 ]; then
   echo "  🚨 $pending PENDING revision request(s) — address FIRST:"
   grep "^\## \[pending\]" "$PH_HOME/founder_requests.md" | sed 's/^/  /'
@@ -56,7 +57,7 @@ cat <<'LOOP'
            or  /loop 30m  (re-run the control-plane tick on an interval)
   Codex :  set a goal; codex goals supervises the chain
   Each tick (YOU act — do not ask the user):
-    1. bash tools/portfolio_tick.sh        # refresh + record + flywheel deposit
+    1. bash control_tower/tools/portfolio_tick.sh        # refresh + record + flywheel deposit
     2. drive GO campaigns autonomously:  run_campaign.sh --key <K> --execute
     3. INTERVENE DIRECTLY on blocked workers (you, not the human):
          - dispatch help:  agent_dispatch.sh --to <best agent> --task "unblock <comp>: <issue>"
@@ -68,4 +69,4 @@ cat <<'LOOP'
     6. repeat — the user is watching a fully automatic operation
 LOOP
 echo "════════════════════════════════════════════════════════════════"
-echo "tip: full protocol in CONTROL_PLANE.md"
+echo "tip: full protocol in control_tower/CONTROL_PLANE.md"

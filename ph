@@ -16,6 +16,8 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph next                ← recommends the single next action (start here if unsure)
   ph discover            refresh the master catalog (all platforms, KR + intl)
   ph money               ROI-rank "돈 되는 것만"  (verify prize)
+  ph auto                자율드라이브 대회 보드 (게이트0 프로그래매틱: CrunchDAO/Kaggle/DrivenData/AIcrowd)
+  ph scrape <url> [args] 범용 SPA/anti-bot 스크래퍼 (Scrapling; 로그인·게이트 없이 읽기)
   ph plan <key> "<name>" decompose a competition into a campaign plan
   ph run <key> [--exec]  drive one competition (dry-run unless --exec)
   ph parallel <k1,k2,..> open tmux workers (CLI agents in parallel)
@@ -41,11 +43,13 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph agents              usage mix vs target share for Claude/Codex/Gemini/etc.
   ph api get <endpoint>  call prizehunter-web REST reads, e.g. board
   ph api post <endpoint> '{...}'  call REST writes with PH_API_KEY
+  ph kevin [--target P]  sync prizehunter state into kevin8738/Dacon dashboard
   ph team ...            team mode: init/onboard/checkin/review/idea/message
   ph complete [key]      completeness gate: package evidence, placeholders, founder gates
   ph strategy            lane-specific win thesis, required proof, kill rule, agent route
   ph gap <key> "<name>"  mine judge intent, our gaps, and 120% backlog
   ph tick                record + refresh + flywheel deposit (the heartbeat)
+  ph sync                push board state to the hosted control-plane (Supabase → web dashboard)
   ph radar               deadline radar: D-day board + 마감경과 자동 아카이브 리포트
   ph pnl                 P&L: registry→prize ledger 동기화 + 비용(EXIT/COSTS.tsv) 합산 요약
   ph settle [close <key> …]  '끝난 후' 정산: 결과 radar / 결과확정→포스트모템→포트폴리오 (playbook/POSTERIOR.md)
@@ -59,33 +63,71 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph capabilities [filter]      check which tools/MCPs are available vs missing for active campaigns
   ph find-tool "<need>"         search MCP marketplaces for a specific capability
   ph creative "<topic>" [key]   anti-AI-default creative divergence: 5 wild framings before building
+  ph doctor              health-check the tools (find broken ones)
   ph autonomy             self-check: what runs unattended vs what to fill
   ph onboard [gate]       ask for ONLY the credential a gate needs, then resume
   ph session --site <s>   log in once → agent extracts API token from browser → vault
   ph browser <open|click|accept|form> …   handle a WEB gate directly (rules accept, form) — not an operator gate
   ph vault KEY VALUE      store one supplied credential (gitignored)
-  ph ontology             build the approach/context ontology from finished competitions
-  ph inherit <key|-m M>   inherit+evolve approaches for a new competition (from ontology)
-  ph goal [key|--board]   per-competition verdict: PUSH/CEILING?/AT_#1 until rank #1
   ph calibrate           predicted-vs-actual → triage self-correction (getting smarter)
   ph council "<q>"       heterogeneous 2nd opinion (your codex/gemini/nim/ollama)
   ph issue "<title>"     file a GitHub issue (agent-native self-reporting)
   ph qa                  release gate: fresh-clone smoke + parse + secrets (run before push)
   ph qa-team [--scope S] standing QA team: role-specialized reviewers (heterogeneous models)
   ph rnd [board|propose|harvest|add|result|select]  evolutionary R&D on the system itself
-  ph doctor              health-check the tools (find broken ones)
 EOF
+        echo ""
+    echo "  ── 2026-07-26 진화 층 ──"
+    echo "  ph steer \"<한 줄>\" | <key> \"<한 줄>\" | list | clear <scope>   ★CENTAUR: founder 직관 5%를 드라이브 브리프 최상위 권위로 즉시 주입"
+    echo "  ph consult ask|panel <key> \"<질문>\" | diverge <key> | claims <key> | push <key> \"<반박>\" | adopt <key>"
+    echo "                           ★이종 자문: ask=agy(Gemini 3.1 Pro high) · panel=agy+council(perplexity/deepseek/claude.ai)"
+    echo "                           → diverge(합의보다 불일치가 정보) → claims(수치·코드 추출+대수붕괴 검출) → push(반박 되돌리기) → adopt(검증 통과분만 브리프)"
+    echo "  ph agent roster|ask <k> <role> \"<p>\"|attack <k> \"<claim>\"|sessions   ★지속세션 에이전트(claude/agy/codex) + 이종 적대검증"
+    echo "  ph lb [--sync] | ph breaker check <ledger> | ph contract selftest   ★목표 신선도 · 정체 감지 · 출력계약(자율성 3가드레일)"
+    echo "  ph view <key>            ★기하 렌더: train↔test 분포·엔티티 수·스키마 괴리 그림(VIEW/index.html) + 기계용 숫자(VIEW/FINDINGS.md)"
+    echo "  ph resonate ask|commit|outcome|status   ★SPINE 공진루프: 내 답을 이종substrate가 공격 → 외부액션 커밋 → 결과기록 → 다음 질문"
+    echo "  ph audit                 목표 감사 (자기참조·산문 rank1·stale ceiling·나쁜 dir) — 드라이브 전에 항상"
+    echo "  ph frame check|make <k>  진입프레임 (검증된 목표·harness신뢰·3+프레이밍·PRIOR태깅·판정어 금지)"
+    echo "  ph gap system | comp <k> 구조적 괴리 사냥 (train↔test·CV↔LB·public↔private·오차예산 / 기계 자기감사)"
+    echo "  ph evolve [--execute]    goal_loop 판정→arm 통합 드라이브 (PUSH/REFUTE/HARD_PIVOT/JUDGED)"
+    echo "  ph meta allocate|priors|variants|exhausted <tt>   프로세스 복리 (어디에·어떤 렌즈·어떤 프롬프트변형)"
+    echo "  ph brief <k> <tt>        변형가능 프롬프트 조립 (BRIEF_BANK.md — 헤드가 계속 변형)"
+    echo "  ph judge120 <k> <dir>    제출형 120% 적대심사 게이트 (통과만 founder 컨펌)"
+    echo "  ph cockpit [--port N]    daemon + 웹 코킷 (자기푸시 루프·컨펌큐·멀티테넌트)"
     ;;
   status)   bash "$T/strategist_brief.sh" >/dev/null 2>&1; python3 "$T/quality_gate.py" >/dev/null 2>&1
-            python3 "$T/activation.py" --line 2>/dev/null
             sed -n '1,40p' "$PH_HOME/STRATEGIST_BRIEF.md" 2>/dev/null
             echo
             echo "## Quality Gate (progress ≠ win probability)"
             sed -n '1,24p' "$PH_HOME/QUALITY_GATE_REPORT.md" 2>/dev/null | sed -n '/| win% /,$p'
             echo; echo "next → ph next" ;;
   next)     bash "$PH_HOME/ph_next.sh" 2>/dev/null || echo "see: ph status" ;;
+  # --- 2026-07-26 layer: entry frame · target audit · gap hunting · unified evolution · mutable briefs ---
+  consult)  bash "$T/consult.sh" "$@" ;;
+  agent)    bash "$T/session_agent.sh" "$@" ;;                                      # ★지속 세션 에이전트: roster/ask/attack/sessions (claude·agy·codex 세션 유지 + 이종 적대검증)
+  contract) python3 "$T/contract.py" "$@" ;;                                        # ★하네스 계약 강제: 읽을 수 없는 출력은 DATAERR(65)로 즉시 실패
+  breaker)  python3 "$T/breaker.py" "$@" ;;                                          # ★프레이밍 서킷브레이커: K회 정체 → 직교 재프레이밍 강제
+  lb)       python3 "$T/lb_sensor.py" "$@" ;;                                        # ★리더보드 센서(+provenance 스탬프, cron 30분)                                            # ★이종 자문(agy/Gemini 3.1 Pro high) + 반박검증: ask→claims→push→adopt
+  steer)    bash "$T/steer.sh" "$@" ;;                                              # ★CENTAUR: founder의 한 줄 지시를 즉시 드라이브 브리프 최상위 권위로 주입
+  view)     python3 "$T/gap_view.py" "$@" ;;                                        # ★기하 렌더: train↔test 분포/엔티티수/스키마 괴리를 사람이 보는 그림 + 기계용 숫자
+  smoke)    bash "$T/smoke.sh" "$@" ;;                                              # ★fresh-install 스모크: 남이 clone해도 부팅되는지 (배포 선행조건)
+  preflight) bash "$T/preflight.sh" "$@" ;;                                         # ★제출 전 규정 체크리스트 + I CONFIRM 기록(지문 바인딩) — 실격 사고의 가장 값싼 방지책
+  watch)    bash "$T/watch.sh" "$@" ;;                                              # ★감시 스크린: 워커 생사·대회 이동·자원·ideation 폭·게이트·doctor
+  transfer) bash "$T/transfer_gate.sh" "$@" ;;                                      # ★전이 게이트: 검증한 것==제출한 것인가 + 로컬이득이 전이 하한선을 넘나
+  resonate) bash "$T/resonate.sh" "$@" ;;                                           # ★SPINE: 재귀적 공진 루프(자기심문×이종substrate, 외부액션 게이트)
+  audit)    python3 "$T/audit_targets.py" "$@" ;;                                  # 목표 감사(자기참조·산문·stale·나쁜dir)
+  frame)    a="${1:-check}"; bash "$T/open_frame.sh" "$a" "${@:2}" ;;               # 진입프레임 검사/열기(판정어 금지·3+프레이밍)
+  gap)      a="${1:-system}"; bash "$T/gap_hunt.sh" "$a" "${@:2}" ;;                # 구조적 괴리 사냥(대회 | system 자기감사)
+  evolve)   bash "$T/evolve.sh" "$@" ;;                                             # goal_loop 판정→실행arm 통합 드라이브
+  brief)    bash "$T/brief_render.sh" "$@" ;;                                       # 변형가능 프롬프트 조립(BRIEF_BANK.md)
+  meta)     bash "$T/meta_learn.sh" "$@" ;;                                         # 프로세스 복리(렌즈/변형 랭킹·EV할당·소진판정)
+  judge120) bash "$T/judge120.sh" "$@" ;;                                           # 제출형 120% 적대심사 게이트
+  cockpit)  python3 "$T/prizehunterd.py" "$@" ;;                                    # daemon+웹코킷(자기푸시·컨펌큐·멀티테넌트)
+
   discover) bash "$T/catalog.sh" "$@"; echo "next → ph money" ;;
   money)    python3 "$T/prize_roi.py" --fetch "$@"; echo "next → ph plan <key> \"<name>\"  (pick a GO row)" ;;
+  auto|autonomous)  cat "$PH_HOME/AUTONOMOUS_BOARD.md" 2>/dev/null || echo "no AUTONOMOUS_BOARD.md"; echo "next → 등록된 T1 드라이브 or programmatic_sources.tsv 스윕" ;;
+  scrape)   "$T/scrape.py" "$@" ;;   # 범용 SPA/anti-bot 스크래퍼 (Scrapling); 사용법 tools/SCRAPE_TOOL.md
   plan)     k="${1:?ph plan <key> \"<name>\"}"; n="${2:-$k}"; python3 "$T/plan_campaign.py" --key "$k" --name "$n" "${@:3}"; echo "next → ph run $k" ;;
   run)      k="${1:?ph run <key> [--exec]}"; shift || true
             ex=""; [ "${1:-}" = "--exec" ] && ex="--execute"
@@ -118,6 +160,11 @@ EOF
   profile)  python3 "$T/operator_profile.py" "$@"; sed -n '1,180p' "$PH_HOME/OPERATOR_PROFILE_DRAFT.md" ;;
   agents)   python3 "$T/agent_usage.py" "$@"; echo "next → adjust AGENT_USAGE_POLICY.tsv or route with ph dispatch <agent> \"<task>\"" ;;
   api)      python3 "$T/ph_api.py" "$@" ;;
+  kevin)    python3 "$T/quality_gate.py" >/dev/null
+            python3 "$T/submission_board.py" >/dev/null
+            python3 "$T/founder_auth_dashboard.py" >/dev/null
+            python3 "$T/export_kevin_dashboard.py" "$@"
+            echo "next → in the Kevin dashboard repo: node scripts/build_dashboard.js && git diff" ;;
   team)     if [ $# -eq 0 ] || [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
               python3 "$T/team_ops.py"
             elif [ "${1#--}" != "$1" ]; then
@@ -172,6 +219,17 @@ EOF
   requests) grep -E "^\## \[(pending|in_progress)\]" "$PH_HOME/founder_requests.md" 2>/dev/null || echo "No pending founder requests."
             echo; echo "Full log: $PH_HOME/founder_requests.md"
             echo "next → pick the first [pending] item and execute as highest-priority work" ;;
+  # doctor = mechanical self-diagnosis (doctor.sh: unsatisfiable gates, key fragmentation, orphan state,
+  # scale mixing, cost leak, dead gate, disk) THEN the older per-tool health scan. Until now `ph doctor`
+  # ran only the latter, so the gate-integrity classes were reachable only via `ph watch`/`ph next` —
+  # the documented health verb was blind to the checks written to catch our most expensive defects.
+  doctor)   bash "$T/doctor.sh" "$@"; rc=$?
+            echo; bash "$PH_HOME/ph_next.sh" --doctor 2>/dev/null || { echo "checking tools..."; for f in "$T"/*.sh; do bash -n "$f" 2>/dev/null || echo "  ❌ syntax: $(basename "$f")"; done; echo "done"; }
+            exit $rc ;;
+  track)    bash "$T/trajectory.sh" "$@" ;;
+  scout)    PATH="$HOME/.local/bin:$PATH" python3 "$T/scout.py" "$@"; echo "next → verify + add high-EV finds to DEEP_POOL.md, enter the best" ;;
+  board)    bash "$T/drive_board.sh" "$@" ;;
+  kernel)   bash "$T/kernel_submit.sh" "$@" ;;
   autonomy) bash "$T/ph_gates.sh" ;;
   onboard)  bash "$T/onboard.sh" "$@" ;;
   session)  python3 "$T/session_capture.py" "$@" ;;
@@ -181,10 +239,10 @@ EOF
   council)  bash "$T/council.sh" "$@"; echo "next → synthesize the independent reads, verify, then decide" ;;
   issue)    t="${1:?ph issue \"<title>\" [body]}"; b="${2:-}"; bash "$T/report_issue.sh" --title "$t" --body "$b"
             echo "next → maintainer triages; set PH_ISSUE_REPO=owner/name to route" ;;
-  doctor)   bash "$PH_HOME/ph_next.sh" --doctor 2>/dev/null || { echo "checking tools..."; for f in "$T"/*.sh; do bash -n "$f" 2>/dev/null || echo "  ❌ syntax: $(basename "$f")"; done; echo "done"; } ;;
   qa)       bash "$T/qa_harness.sh" "$@" ;;
   qa-team)  bash "$T/qa_team.sh" "$@" ;;
   rnd)      python3 "$T/rnd_loop.py" "$@" ;;
   browser)  python3 "$T/browser_gate.py" "$@" ;;
+  sync)     python3 "$T/dashboard_sync.py" "$@" ;;
   *) echo "unknown verb: $v"; exec "$0" help ;;
 esac

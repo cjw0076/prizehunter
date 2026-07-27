@@ -25,7 +25,13 @@ EOF
 
 rows=(
   "PrizeHunter brand|$VIS/prizehunter-brand-hero.png|$VIS/prizehunter-brand-hero.png"
-  # add your own: "Name|$VIS/your-hero.png|<reference image path>"
+  "Qwen RuleMemory|$VIS/qwen-rulememory-hero.png|$ROOT/competitions/qwen_cloud_hackathon_2026/media/hero-reference.png"
+  "Rapid RuleMemory Cloud|$VIS/rapid-rulememory-cloud-hero.png|$ROOT/competitions/rapid_agent_2026/media/hero-reference.png"
+  "FIND EVIL DFIR|$VIS/find-evil-dfir-hero.png|$ROOT/competitions/find_evil_2026/media/hero-reference.png"
+  "Splunk Ops Copilot|$VIS/splunk-ops-copilot-hero.png|$ROOT/competitions/splunk_agentic_ops_2026/media/hero-reference.png"
+  "UiPath Command Tower|$VIS/uipath-command-tower-hero.png|$ROOT/competitions/uipath_agenthack_2026/media/hero-reference.png"
+  "AI Case Pharmacist|$VIS/ai-case-pharmacist-hero.png|$ROOT/competitions/ai_case_contest_2026/media/hero-reference.png"
+  "MOCT CulturalRx|$VIS/moct-culturalrx-hero.png|$CONTROL/campaigns/moct_ai_data/media/hero-reference.png"
 )
 
 missing=0

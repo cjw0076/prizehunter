@@ -134,12 +134,15 @@ def source_image_prompt(key: str, scene: dict[str, str]) -> str:
 Generate source/key images before video:
 
 1. Character/world board still
-   - Use Gemini image generation or ChatGPT image generation.
+   - Use Codex built-in image_gen.
    - Preserve exact local/cultural details from the source excerpt.
    - No fake Korean text unless the submission requires text.
 
 2. Key frame still
    - Cinematic production still for the start frame.
+   - Read the shot cinematic block in HIGGSFIELD_MANIFEST.json.
+   - Lock exact clock time/weather; key direction/type/color/hardness;
+     ambient/rim; contrast/shadows; lens; and only the approved 2-3 colors.
    - Clear subject, readable composition, stable lighting, no generic AI glow.
 
 3. End frame still
@@ -176,12 +179,29 @@ def write_campaign(row: dict[str, str]) -> dict[str, str]:
         "source_docs": found,
         "status": "source_image_prompt_ready",
         "tools": {
-            "source_images": ["gemini.google.ai", "chatgpt.com image generation"],
+            "source_images": ["codex built-in image_gen"],
             "vibe_video": specs["draft_model"],
             "final_video": specs["final_model"],
-            "editing": ["CapCut", "Premiere", "DaVinci Resolve"],
+            "editing": [
+                "Premiere Pro",
+                "DaVinci Resolve",
+                "local imageio_ffmpeg FFmpeg 7.0.2",
+            ],
+        },
+        "cinematic_standard": {
+            "spec": "competitions/control_tower/CINEMATIC_VIDEO_STANDARD.md",
+            "validator": "competitions/control_tower/tools/validate_cinematic_manifest.py",
+            "grade_fallback": "competitions/control_tower/tools/cinematic_grade.sh",
+            "film_palette_size": "exactly 2-3 dominant colors",
+            "raw_master_preserved": True,
+            "grade_evidence_required": True,
         },
         "gates": [
+            {
+                "name": "cinematic_manifest_valid",
+                "required_before": "source_image_generation",
+                "evidence": "HIGGSFIELD_MANIFEST.json plus validator PASS",
+            },
             {
                 "name": "source_images_ready",
                 "required_before": "low_cost_seedance_vibe_check",
@@ -222,10 +242,11 @@ def write_campaign(row: dict[str, str]) -> dict[str, str]:
         "",
         f"Generated: {generated_at} KST",
         "",
-        "Use Gemini image generation or ChatGPT image generation to create the",
+        "Use Codex built-in image_gen to create the",
         "character board, world board, start frame, and end frame before any video",
-        "generation. Save outputs in this folder and record filenames in",
-        "`source_image_manifest.tsv`.",
+        "generation. Apply the exact time, light direction, 2-3-color palette,",
+        "contrast/shadow, lens, and continuity fields from HIGGSFIELD_MANIFEST.json.",
+        "Save outputs in this folder and record filenames in source_image_manifest.tsv.",
         "",
     ]
     prompts.extend(source_image_prompt(key, scene) for scene in scenes)
@@ -259,7 +280,8 @@ visual continuity.
     manifest = assets / "source_image_manifest.tsv"
     if not manifest.exists():
         manifest.write_text(
-            "scene\trole\ttool\tprompt_file\toutput_file\tseed_or_id\tlicense_note\tqa_status\n",
+            "scene\trole\ttool\tprompt_file\toutput_file\tdimensions\tsha256\t"
+            "seed_or_id\tlicense_note\tcinematic_manifest_status\tvisual_qa_status\n",
             encoding="utf-8",
         )
 
@@ -271,10 +293,13 @@ This campaign now follows the control-tower Higgsfield/Seedance production
 standard:
 
 1. Claude/storyboard source is treated as the creative base.
-2. Gemini or ChatGPT image generation creates character/world/key-frame boards.
+2. Codex built-in image_gen creates and visually verifies character, world,
+   start-frame, and required end-frame boards.
 3. Higgsfield Seedance low/cost model checks vibe and continuity.
 4. Seedance 2.0+ produces final clips only after the vibe gate passes.
-5. Editing/export/submission evidence is recorded before closeout.
+5. Raw clips are preserved; every clip receives one tone-and-mood grade plus
+   raw/graded contact-sheet evidence before shot matching and export.
+6. Editing/export/submission evidence is recorded before closeout.
 
 ## Current Inputs
 
@@ -293,7 +318,9 @@ standard:
 
 ## Next Action
 
-Generate the source images first, then fill `source_image_manifest.tsv`.
+First run `tools/validate_cinematic_manifest.py` on HIGGSFIELD_MANIFEST.json.
+Then generate source images with Codex image_gen and fill
+`source_image_manifest.tsv`.
 After that, run low-cost Higgsfield/Seedance drafts and score them in
 `vibe_check_scorecard.md`. Do not run Seedance 2.0+ until the scorecard passes.
 
