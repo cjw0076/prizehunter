@@ -48,6 +48,7 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph complete [key]      completeness gate: package evidence, placeholders, founder gates
   ph strategy            lane-specific win thesis, required proof, kill rule, agent route
   ph gap <key> "<name>"  mine judge intent, our gaps, and 120% backlog
+  ph goal [--board|--key K]   goal loop: drive verdicts (PUSH/REFUTE/…) per competition
   ph tick                record + refresh + flywheel deposit (the heartbeat)
   ph sync                push board state to the hosted control-plane (Supabase → web dashboard)
   ph sandbox -- CMD…     run agent-generated code in the container sandbox (no net, non-root)
@@ -118,7 +119,12 @@ EOF
   resonate) bash "$T/resonate.sh" "$@" ;;                                           # ★SPINE: 재귀적 공진 루프(자기심문×이종substrate, 외부액션 게이트)
   audit)    python3 "$T/audit_targets.py" "$@" ;;                                  # 목표 감사(자기참조·산문·stale·나쁜dir)
   frame)    a="${1:-check}"; bash "$T/open_frame.sh" "$a" "${@:2}" ;;               # 진입프레임 검사/열기(판정어 금지·3+프레이밍)
-  gap)      a="${1:-system}"; bash "$T/gap_hunt.sh" "$a" "${@:2}" ;;                # 구조적 괴리 사냥(대회 | system 자기감사)
+  gap)      a="${1:-system}"
+            case "$a" in
+              comp|system) bash "$T/gap_hunt.sh" "$a" "${@:2}" ;;   # 구조적 괴리 사냥(대회 | system 자기감사)
+              *) k="$a"; n="${2:?ph gap <key> \"<name>\"}"; shift 2
+                 python3 "$T/prize_gap_loop.py" --key "$k" --name "$n" "$@"; echo "next → ph collab $k \"$n\" or ph plan $k \"$n\"" ;;
+            esac ;;
   evolve)   bash "$T/evolve.sh" "$@" ;;                                             # goal_loop 판정→실행arm 통합 드라이브
   brief)    bash "$T/brief_render.sh" "$@" ;;                                       # 변형가능 프롬프트 조립(BRIEF_BANK.md)
   meta)     bash "$T/meta_learn.sh" "$@" ;;                                         # 프로세스 복리(렌즈/변형 랭킹·EV할당·소진판정)
@@ -132,7 +138,8 @@ EOF
   plan)     k="${1:?ph plan <key> \"<name>\"}"; n="${2:-$k}"; python3 "$T/plan_campaign.py" --key "$k" --name "$n" "${@:3}"; echo "next → ph run $k" ;;
   run)      k="${1:?ph run <key> [--exec]}"; shift || true
             ex=""; [ "${1:-}" = "--exec" ] && ex="--execute"
-            bash "$T/run_campaign.sh" --key "$k" $ex; echo "next → ph parallel (add more) or ph run $k --exec" ;;
+            bash "$T/run_campaign.sh" --key "$k" $ex; rc=$?
+            echo "next → ph parallel (add more) or ph run $k --exec"; exit $rc ;;
   parallel) bash "$T/run_parallel.sh" --keys "${1:?ph parallel <k1,k2,..>}" "${@:2}"; echo "next → ph status" ;;
   dispatch) a="${1:?ph dispatch <agent> \"<task>\"}"; AGENT="${AGENT:-ph}" bash "$T/agent_dispatch.sh" --to "$a" --task "${2:?need task}" "${@:3}" ;;
   route)    python3 "$T/model_router.py" "$@" ;;
@@ -179,8 +186,6 @@ EOF
   strategy) python3 "$T/quality_gate.py" >/dev/null
             sed -n '1,260p' "$PH_HOME/STRATEGY_PLAYBOOK_BY_LANE.md"
             echo "next → ph quality" ;;
-  gap)      k="${1:?ph gap <key> \"<name>\"}"; n="${2:?need name}"; shift 2
-            python3 "$T/prize_gap_loop.py" --key "$k" --name "$n" "$@"; echo "next → ph collab $k \"$n\" or ph plan $k \"$n\"" ;;
   tick)     bash "$T/portfolio_tick.sh" ;;
   radar)    python3 "$T/deadline_watchdog.py" --report; echo "next → clear the nearest D-day founder gate, or ph tick" ;;
   pnl)      python3 "$T/pnl_sync.py"; echo; sed -n '1,40p' "$PH_HOME/EXIT/PNL_SUMMARY.md" 2>/dev/null
@@ -244,7 +249,8 @@ EOF
   qa-team)  bash "$T/qa_team.sh" "$@" ;;
   rnd)      python3 "$T/rnd_loop.py" "$@" ;;
   browser)  python3 "$T/browser_gate.py" "$@" ;;
+  goal)     python3 "$T/goal_loop.py" "$@" ;;
   sync)     python3 "$T/dashboard_sync.py" "$@" ;;
   sandbox)  bash "$T/sandbox_run.sh" "$@" ;;
-  *) echo "unknown verb: $v"; exec "$0" help ;;
+  *) echo "unknown verb: $v" >&2; "$0" help >&2; exit 2 ;;
 esac

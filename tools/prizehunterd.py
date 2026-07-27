@@ -40,6 +40,8 @@ def load_token():
     if t:
         return t.strip()
     try:
+        if os.stat(TOKENF).st_mode & 0o077:
+            os.chmod(TOKENF, 0o600)  # heal a loose pre-existing file before trusting it
         t = open(TOKENF).read().strip()
         if t:
             return t
@@ -49,6 +51,7 @@ def load_token():
     fd = os.open(TOKENF, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
     with os.fdopen(fd, "w") as f:
         f.write(t + "\n")
+    os.chmod(TOKENF, 0o600)  # O_TRUNC keeps a pre-existing file's old mode; force 0600
     return t
 
 
@@ -119,10 +122,11 @@ def resolve_tenant(token):
     if not token:
         return None
     h = _sha(token)
+    found = None
     for tid, t in load_tenants().items():
-        if hmac.compare_digest(t.get("token_sha256", ""), h):
-            return tid
-    return None
+        if hmac.compare_digest(t.get("token_sha256", ""), h) and found is None:
+            found = tid
+    return found  # always walks every tenant so timing cannot leak match position (QA 2026-07-28)
 
 LOGIN = """<!doctype html><meta charset=utf-8><title>PrizeHunter — 로그인</title>
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fbfbfa;color:#191917;

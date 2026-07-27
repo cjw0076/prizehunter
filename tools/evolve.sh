@@ -25,6 +25,9 @@ MAP="$R/evolve_map.tsv"          # key \t campaign_dir \t task_type   (auto-gues
 WF="${PH_WORKERS:-$R/fleet_workers.tsv}"
 EXEC=0; ONLY=""; MAX=2
 while [ $# -gt 0 ]; do case "$1" in --execute) EXEC=1;; --key) ONLY="${2:-}"; shift;; --max) MAX="${2:-2}"; shift;; esac; shift; done
+# --execute launches frame/gap workers below — refuse to START them under disk pressure
+# BEFORE any launch, not after (the late disk_block check let workers spawn first; QA 2026-07-28)
+if [ "$EXEC" = 1 ]; then bash "$CT/tools/disk_guard.sh" || exit 3; fi
 NCORES="$(nproc 2>/dev/null || echo 8)"; L="$(cut -d' ' -f1 /proc/loadavg 2>/dev/null || echo 0)"
 MAXLOAD="${AUTOPUSH_MAXLOAD:-$(python3 -c "print(int($NCORES*1.2))" 2>/dev/null || echo 60)}"
 touch "$MAP" "$WF"

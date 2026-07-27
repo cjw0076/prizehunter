@@ -20,11 +20,75 @@ CAP="$CONTROL/capabilities"
 REG="$CAP/_registry.tsv"
 LOGDIR="$CAP/dispatch_log"; mkdir -p "$LOGDIR"
 FROM="${AGENT:-unknown}"; TO=""; TASK=""; TIMEOUT=600; ESC=""; MODEL=""; DRY=0
+COUNCIL_HOME="${COUNCIL_HOME:-/home/user/workspaces/jaewon/council}"
 
 reg_field() { # $1=agent $2=colindex(1-based) -> value
   awk -F'\t' -v a="$1" -v c="$2" '$1==a{print $c; exit}' "$REG"
 }
 installed_agents() { awk -F'\t' 'NR>1 && $1!~"^#" && $4=="yes"{print $1}' "$REG"; }
+
+council_substrate() {
+  case "$1" in
+    codex|claude|gemini|nim|aios) printf '%s\n' "$1" ;;
+    ollama|local|qwen) printf '%s\n' "${PH_COUNCIL_LOCAL_SUBSTRATE:-local-qwen-coder}" ;;
+    *) return 1 ;;
+  esac
+}
+
+council_available() {
+  [ "${PH_USE_COUNCIL:-1}" != "0" ] && [ -f "$COUNCIL_HOME/hub.py" ] && command -v python3 >/dev/null 2>&1
+}
+
+council_thread_for() {
+  if [ -n "${PH_COUNCIL_THREAD:-}" ]; then
+    printf '%s\n' "$PH_COUNCIL_THREAD"
+  else
+    printf 'ph_dispatch_%s_to_%s' "$FROM" "$1" | tr -cs 'A-Za-z0-9_.:-' '_'
+  fi
+}
+
+council_json_text() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+try:
+    data = json.load(open(path, encoding="utf-8"))
+except Exception:
+    print(open(path, encoding="utf-8", errors="replace").read())
+    sys.exit(1)
+text = data.get("text") or data.get("error") or ""
+if text:
+    print(text)
+sys.exit(0 if data.get("ok") else 1)
+PY
+}
+
+run_council_agent() {
+  local agent="$1" sid thread tmp rc json_rc
+  council_available || return 125
+  sid="$(council_substrate "$agent")" || return 125
+  thread="$(council_thread_for "$agent")"
+  if [ "$DRY" -eq 1 ]; then
+    echo "[dry-run] council thread=$thread: python3 $COUNCIL_HOME/hub.py ask $sid <task> --thread $thread --timeout $TIMEOUT"
+    return 0
+  fi
+  tmp="$(mktemp)"
+  if timeout "$TIMEOUT" python3 "$COUNCIL_HOME/hub.py" ask "$sid" "$TASK" --thread "$thread" --timeout "$TIMEOUT" >"$tmp" 2>"$tmp.err"; then
+    rc=0
+  else
+    rc=$?
+    cat "$tmp.err" >&2 2>/dev/null || true
+  fi
+  if [ -s "$tmp" ]; then
+    json_rc=0
+    council_json_text "$tmp" || json_rc=$?
+    [ "$json_rc" -eq 0 ] || rc="$json_rc"
+  fi
+  rm -f "$tmp" "$tmp.err"
+  return "$rc"
+}
 
 cmd="${1:-}"
 case "$cmd" in
@@ -72,7 +136,16 @@ done
 [ -n "$TO" ] && [ -n "$TASK" ] || { echo "need --to and --task" >&2; exit 2; }
 
 run_agent() { # $1=agent -> echoes output, returns rc
-  local agent="$1" tmpl bin
+  local agent="$1" tmpl bin council_rc
+  if run_council_agent "$agent"; then
+    return 0
+  else
+    council_rc=$?
+  fi
+  if [ "$council_rc" -ne 125 ] && [ "${PH_COUNCIL_DIRECT_FALLBACK:-0}" != "1" ]; then
+    echo "[dispatch] Council attempt failed for $agent (rc=$council_rc); direct fallback disabled" >&2
+    return "$council_rc"
+  fi
   tmpl="$(reg_field "$agent" 5)"
   if [ -z "$tmpl" ]; then echo "[dispatch] unknown agent: $agent" >&2; return 3; fi
   bin="$(printf '%s' "$tmpl" | awk '{print $1}')"
@@ -83,6 +156,8 @@ run_agent() { # $1=agent -> echoes output, returns rc
   local cmdline="${tmpl/\{TASK\}/$(printf '%q' "$TASK")}"
   cmdline="${cmdline/\{MODEL\}/${MODEL:-llama3}}"
   if [ "$DRY" -eq 1 ]; then echo "[dry-run] $cmdline"; return 0; fi
+  # dispatch = new agent work; refuse under disk pressure (guard prints why; QA 2026-07-28)
+  bash "$CONTROL/tools/disk_guard.sh" || return 3
   timeout "$TIMEOUT" bash -c "$cmdline" 2>&1
 }
 

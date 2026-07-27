@@ -22,6 +22,22 @@ services:
     entrypoint: ["/app/ph"]
     command: ["doctor"]
 
+  sandbox:
+    # the ONLY compose service agent-generated code should run in: no network, campaigns-only
+    # writable mount, non-root. `docker compose run --rm sandbox -- CMD…`
+    build: .
+    image: prizehunter:local
+    network_mode: "none"
+    user: "${UID:-1000}:${GID:-1000}"
+    working_dir: /work
+    volumes:
+      - ./campaigns:/work
+    environment:
+      - PH_DOCKER=1
+      - PH_SANDBOX_ACCEPT_CONTAINER=1
+      - HOME=/tmp
+    entrypoint: ["/app/tools/sandbox_run.sh"]
+
   cockpit:
     build: .
     image: prizehunter:local
@@ -33,7 +49,10 @@ services:
       - PH_DOCKER=1
       - HOME=/tmp
     entrypoint: ["python3", "tools/prizehunterd.py"]
-    command: ["--port", "8787"]
+    # inside the container the daemon must bind 0.0.0.0 or the published port cannot
+    # reach it (loopback inside a container is unreachable through a port map);
+    # host-side exposure stays localhost-only via the 127.0.0.1 port binding below
+    command: ["--port", "8787", "--bind", "0.0.0.0"]
     ports:
       # localhost only — the cockpit can trigger drives; never publish it to 0.0.0.0
       - "127.0.0.1:8787:8787"

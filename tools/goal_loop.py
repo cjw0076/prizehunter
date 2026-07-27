@@ -211,8 +211,9 @@ def main():
     ap.add_argument("--design", metavar="KEY")
     ap.add_argument("--board", action="store_true")
     a = ap.parse_args()
-    # disk guard: --board/--record are read-only, but a --key drive starts new work
-    if a.key and subprocess.call(["bash", os.path.join(HERE, "disk_guard.sh")]) != 0:
+    # disk guard: only a NEW drive is refused. --record is bookkeeping for work already
+    # done — refusing it under pressure silently drops drive history (QA 2026-07-28).
+    if a.key and not a.record and subprocess.call(["bash", os.path.join(HERE, "disk_guard.sh")]) != 0:
         sys.exit(3)
     rows = P.parse_registry(with_extras=False)
     if a.design:

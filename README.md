@@ -19,6 +19,18 @@ bash setup.sh          # deps + config + registry from template
 ./ph next              # ← the single next action when unsure
 ```
 
+**Docker** (pinned runtime, non-root, the sandbox agent-generated code runs in):
+
+```bash
+docker compose run --rm worker smoke    # fresh-install verification (18 checks)
+docker compose run --rm worker doctor   # health check
+docker compose up cockpit               # web cockpit → http://127.0.0.1:8787 (tokened)
+```
+
+State stays in this directory (bind-mounted plain files you own); secrets stay in
+gitignored env files; the cockpit is published to localhost only. CI builds the
+image and runs the in-container smoke on every push.
+
 Then, in any agent, type the one word:
 
 ```
