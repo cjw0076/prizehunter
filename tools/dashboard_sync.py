@@ -80,10 +80,29 @@ if not reg.exists():
           f"would masquerade as a fresh empty board)", flush=True)
     sys.exit(1)
 comps, skipped = [], 0
-rows = list(csv.reader(reg.read_text(encoding="utf-8", errors="replace").splitlines(), delimiter="\t"))
+reg_text = reg.read_text(encoding="utf-8", errors="replace")
+rows = list(csv.reader(reg_text.splitlines(), delimiter="\t"))
+data_n = sum(1 for r in rows if r and not r[0].startswith("#") and r[0].strip())
+# ROLLING BACKUP: this runs every 30 min and READS a healthy registry — snapshot it so the ONLY recovery
+# source is never a week-old backup again (2026-08-01: a naive edit racing a concurrent writer truncated the
+# registry to 0 bytes; the freshest backup was 6 days old). Keep the last 48 (≈24h). Cheap insurance on the
+# single source of truth. A near-empty registry is NOT backed up (it would overwrite a good snapshot).
+if data_n >= 20:
+    bdir = CT / ".runs" / "registry_backups"; bdir.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.datetime.now().strftime("%Y%m%dT%H%M%S")
+    (bdir / f"portfolio_registry.{stamp}.tsv").write_text(reg_text, encoding="utf-8")
+    keep = sorted(bdir.glob("portfolio_registry.*.tsv"))
+    for old in keep[:-48]:
+        try: old.unlink()
+        except OSError: pass
+else:
+    print(f"[{now()}] registry has only {data_n} data rows — NOT snapshotting (would overwrite a good backup)", flush=True)
 for r in rows[1:]:
+    if not r or r[0].startswith("#") or not r[0].strip():
+        continue  # comment/header/blank lines are structure, NOT skipped data (2026-08-01: the counter used
+                  # to cry wolf — the QA-round "17 malformed rows" were all comment lines, zero real data)
     if len(r) < 11:
-        if any(f.strip() for f in r): skipped += 1
+        skipped += 1
         continue
     comps.append({"key": r[0][:120], "name": r[0][:120], "metric": r[3][:120], "direction": r[4][:40],
                   "best": r[5][:200], "rank1": r[6][:100], "progress": parse_progress(r[7]),
