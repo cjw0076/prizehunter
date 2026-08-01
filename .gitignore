@@ -30,7 +30,8 @@ DISCOVERY_REPORT.md
 PORTFOLIO_STATUS.md
 .omc/
 .aios/
-.claude/
+.claude/*
+!.claude/commands/
 
 # OS
 .DS_Store

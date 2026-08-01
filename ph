@@ -49,6 +49,7 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph strategy            lane-specific win thesis, required proof, kill rule, agent route
   ph gap <key> "<name>"  mine judge intent, our gaps, and 120% backlog
   ph goal [--board|--key K]   goal loop: drive verdicts (PUSH/REFUTE/…) per competition
+  ph name <key> [run]         NAMING ORGAN — escape a stuck framing by NAMING it (data 매몰 방지): name the rut → heterogeneous voices name the residual → witness gate → orthogonal frame
   ph tick                record + refresh + flywheel deposit (the heartbeat)
   ph sync                push board state to the hosted control-plane (Supabase → web dashboard)
   ph sandbox -- CMD…     run agent-generated code in the container sandbox (no net, non-root)
@@ -251,6 +252,8 @@ EOF
   browser)  python3 "$T/browser_gate.py" "$@" ;;
   goal)     python3 "$T/goal_loop.py" "$@" ;;
   sync)     python3 "$T/dashboard_sync.py" "$@" ;;
+  name)     k="${1:?ph name <key> [propose|judge|frame|run|log] (default run)}"; sub="${2:-run}"; shift $(( $#>=2 ? 2 : 1 ))
+            bash "$T/name_organ.sh" "$sub" "$k" "$@" ;;   # 명명 조직: 갇힌 프레임에 이름→잔차 명명(codex/agy/local)→witness→직교 프레임
   sandbox)  bash "$T/sandbox_run.sh" "$@" ;;
   *) echo "unknown verb: $v" >&2; "$0" help >&2; exit 2 ;;
 esac
