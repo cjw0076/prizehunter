@@ -28,7 +28,9 @@ from datetime import date, datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 CT = os.path.abspath(os.path.join(HERE, ".."))
 sys.path.insert(0, CT)
+sys.path.insert(0, HERE)
 import prizehunter_ui as P  # noqa: E402  (extract_deadline/parse_registry 재사용)
+from _registry_atomic import write_registry_atomic  # noqa: E402
 
 REGISTRY = os.path.join(CT, "portfolio_registry.tsv")
 RADAR = os.path.join(CT, "DEADLINE_RADAR.md")
@@ -37,6 +39,16 @@ STATE = os.path.join(CT, ".runs", "deadline_watchdog.state")
 TG = os.path.join(HERE, "tg.sh")
 
 LAPSE_STATUSES = {"active", "blocked", "scaffold", "polishing", "recon", "ready-gate"}
+
+
+def base_status(s):
+    """`active(PRIMARY·대상시스템)` is still `active`. Annotations mark importance; they must never
+    remove a row from the watch. Split on the first bracket/space/slash and lower-case the rest."""
+    return re.split(r"[(\[/·|:\s]", (s or "").strip(), maxsplit=1)[0].strip().lower()
+
+
+def watched(r):
+    return base_status(r.get("status")) in LAPSE_STATUSES
 GRACE_DAYS = 2  # dday <= -2 에서만 자동 전환 (날짜 파싱 오차·심사/발표일 혼동 보호)
 NCOLS = 11
 S_I, B_I = 8, 9  # status / blocker 컬럼 인덱스
@@ -70,7 +82,7 @@ def deadline_confirmed(r):
 def lapse_candidates(rows):
     cand, ambiguous = [], []
     for r in rows:
-        if r["status"] not in LAPSE_STATUSES or r.get("dday") is None or r["dday"] > -GRACE_DAYS:
+        if not watched(r) or r.get("dday") is None or r["dday"] > -GRACE_DAYS:
             continue
         (cand if deadline_confirmed(r) else ambiguous).append(r)
     return cand, ambiguous
@@ -93,10 +105,7 @@ def rewrite_registry(cand, today):
                           f"실제 제출했다면 registry 정정] {old_blocker}")
             changed.append((r["key"], r["deadline"], old_status, old_blocker))
             lines.append("\t".join(parts))
-    tmp = REGISTRY + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines) + "\n")
-    os.replace(tmp, REGISTRY)
+    write_registry_atomic(REGISTRY, "\n".join(lines))
     if changed:
         new = not os.path.exists(LEDGER)
         with open(LEDGER, "a", encoding="utf-8") as f:
@@ -111,11 +120,17 @@ def rewrite_registry(cand, today):
 
 def write_radar(rows, changed, ambiguous, today, now):
     up = sorted((r for r in rows
-                 if r["status"] in LAPSE_STATUSES and r.get("dday") is not None and r["dday"] >= 0),
+                 if watched(r) and r.get("dday") is not None and r["dday"] >= 0),
                 key=lambda r: r["dday"])
     just = [r for r in rows
-            if r["status"] in LAPSE_STATUSES and r.get("dday") is not None
+            if watched(r) and r.get("dday") is not None
             and -GRACE_DAYS < r["dday"] < 0]
+    # A watched row whose deadline could not be parsed is NOT a row without a deadline — it is a row
+    # we cannot see. This competition dropped off the radar twice that way: once because the status
+    # carried an annotation the filter did not expect, and once (2026-08-06, 23h before its deadline)
+    # because a blocker rewrite replaced the parseable `마감 YYYY-MM-DD` with a bare `08-07`. Both times
+    # the radar looked healthy. Silence about a deadline is the one thing this file must never do.
+    unparsed = [r for r in rows if watched(r) and r.get("dday") is None]
     lapsed_total = sum(1 for r in rows if r["status"] == "lapsed")
     L = [f"# Deadline Radar — {now}", "",
          f"- watchdog: 마감경과 {GRACE_DAYS}일 유예+마감문맥 확인 후 자동 lapsed · D≤3/lapse 배치 알림(하루≤1회) · 원장 LAPSED_LEDGER.tsv",
@@ -129,6 +144,12 @@ def write_radar(rows, changed, ambiguous, today, now):
     L += ["", "## 📆 그 외 다가오는 마감", ""]
     for r in (r for r in up if r["dday"] > 14):
         L.append(f"- D-{r['dday']} {r['key']} ({r['deadline']})")
+    if unparsed:
+        L += ["", "## ⚠️ 마감을 읽지 못한 active 행 — 레이더 사각지대", "",
+              "`blocker` 에 `마감 YYYY-MM-DD` 형태가 없으면 이 행은 임박 목록에 절대 나타나지 않는다.",
+              "여기 있는 동안은 **마감이 없는 것이 아니라 마감을 모르는 것**이다.", ""]
+        L += [f"- {r['key']} ({r['status']}) — {clip(r.get('blocker') or '(blocker 비어 있음)', 90)}"
+              for r in unparsed]
     if just:
         L += ["", f"## 🟡 방금 지남 (유예 {GRACE_DAYS}일 내) — 확인 필요", ""]
         L += [f"- {r['key']} — 마감 {r['deadline']} (D{r['dday']}) · {clip(r['blocker'], 90)}" for r in just]

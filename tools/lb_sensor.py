@@ -38,6 +38,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 CT = os.path.dirname(HERE)
 ROOT = os.path.dirname(os.path.dirname(CT))
 REG = os.path.join(CT, "portfolio_registry.tsv")
+sys.path.insert(0, HERE)
+from _registry_atomic import write_registry_atomic
 SOURCES = os.path.join(CT, "lb_sources.tsv")
 HIST = os.path.join(CT, ".runs", "lb_history.tsv")
 KAGGLE = os.path.expanduser("~/miniconda3/bin/kaggle")
@@ -278,7 +280,7 @@ def main():
         lines[i] = "\t".join(f)
         changed += 1
         print("  ✓ %-28s rank1 %s → %.6g (stamped)" % (f[0][:28], hit[0][1], hit[0][2]))
-    open(REG, "w", encoding="utf-8").write("\n".join(lines))
+    write_registry_atomic(REG, "\n".join(lines))
     print("  synced %d row(s) · history: %s" % (changed, HIST))
     return 0
 

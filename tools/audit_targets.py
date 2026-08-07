@@ -21,6 +21,8 @@ import argparse, json, os, re, sys
 
 CT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT = os.path.dirname(CT)                    # repo root (dacon/)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from _registry_atomic import write_registry_atomic  # noqa: E402
 REG = os.path.join(CT, "portfolio_registry.tsv")
 NUM = re.compile(r"^[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?$")
 NUMIN = re.compile(r"[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?")
@@ -185,7 +187,7 @@ def fix_dirs(cols, rs, findings):
                 changed += 1
                 break
     if changed:
-        open(REG, "w").write("\n".join(lines))
+        write_registry_atomic(REG, "\n".join(lines))
     return changed
 
 

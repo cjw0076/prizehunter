@@ -23,7 +23,9 @@ from datetime import datetime
 HERE = os.path.dirname(os.path.abspath(__file__))
 CT = os.path.abspath(os.path.join(HERE, ".."))
 sys.path.insert(0, CT)
+sys.path.insert(0, HERE)
 import prizehunter_ui as P  # noqa: E402
+from _registry_atomic import write_registry_atomic  # noqa: E402
 
 OUTCOMES = os.path.join(CT, "OUTCOMES.tsv")
 RADAR = os.path.join(CT, "RESULTS_RADAR.md")
@@ -133,10 +135,7 @@ def set_registry_settled(key):
             hit = True
         lines.append(raw)
     if hit:
-        tmp = REGISTRY + ".tmp"
-        with open(tmp, "w", encoding="utf-8") as f:
-            f.write("\n".join(lines) + "\n")
-        os.replace(tmp, REGISTRY)
+        write_registry_atomic(REGISTRY, "\n".join(lines))
     return hit
 
 
