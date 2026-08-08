@@ -17,6 +17,7 @@ CT="$(cd -- "$(dirname "$0")/.." && pwd)"
 R="${PH_RUNS:-$CT/.runs}"; mkdir -p "$R"
 # refuse to start a NEW push cycle under disk pressure (disk_guard prints why)
 bash "$CT/tools/disk_guard.sh" || exit 3
+python3 "$CT/tools/proprioception.py" assert registry || exit 3   # fail-closed on unprovable registry state
 BOARD="${PH_BOARD:-$R/autopush_board.tsv}"; WF="${PH_WORKERS:-$R/fleet_workers.tsv}"
 ROOT="$(cd "$CT/.." && pwd)"; cd "$ROOT" || exit 1
 touch "$BOARD" "$WF"

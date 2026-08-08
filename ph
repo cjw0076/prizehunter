@@ -50,6 +50,7 @@ ph — Prize Hunter control surface (run any verb; each tells you the next step)
   ph gap <key> "<name>"  mine judge intent, our gaps, and 120% backlog
   ph goal [--board|--key K]   goal loop: drive verdicts (PUSH/REFUTE/…) per competition
   ph name <key> [run]         NAMING ORGAN — escape a stuck framing by NAMING it (data 매몰 방지): name the rut → heterogeneous voices name the residual → witness gate → orthogonal frame
+  ph selfcheck            proprioception: is the system's OWN state (senses·loops) provably alive? (fail-closed)
   ph tick                record + refresh + flywheel deposit (the heartbeat)
   ph sync                push board state to the hosted control-plane (Supabase → web dashboard)
   ph sandbox -- CMD…     run agent-generated code in the container sandbox (no net, non-root)
@@ -255,5 +256,6 @@ EOF
   name)     k="${1:?ph name <key> [propose|judge|frame|run|log] (default run)}"; sub="${2:-run}"; shift $(( $#>=2 ? 2 : 1 ))
             bash "$T/name_organ.sh" "$sub" "$k" "$@" ;;   # 명명 조직: 갇힌 프레임에 이름→잔차 명명(codex/agy/local)→witness→직교 프레임
   sandbox)  bash "$T/sandbox_run.sh" "$@" ;;
+  selfcheck) python3 "$T/proprioception.py" "$@" ;;   # 자기상태 감각(레지스트리·대시보드·eval·loop·gate) fail-closed 판정
   *) echo "unknown verb: $v" >&2; "$0" help >&2; exit 2 ;;
 esac

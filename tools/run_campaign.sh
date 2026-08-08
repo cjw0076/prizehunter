@@ -13,6 +13,8 @@ CONTROL="$(cd -- "$(dirname "$0")/.." && pwd)"
 ROOT="$(cd -- "$CONTROL/../.." && pwd)"
 # refuse to START a campaign drive under disk pressure (in-flight work unaffected)
 bash "$CONTROL/tools/disk_guard.sh" || exit 3
+# proprioception: refuse to record into a registry we cannot prove is intact (fail-closed)
+python3 "$CONTROL/tools/proprioception.py" assert registry || exit 3
 REG="$CONTROL/portfolio_registry.tsv"
 KEY=""; EXECUTE=0; ONLY_PHASE=""
 while [ "$#" -gt 0 ]; do case "$1" in

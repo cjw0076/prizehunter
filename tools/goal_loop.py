@@ -215,6 +215,10 @@ def main():
     # done — refusing it under pressure silently drops drive history (QA 2026-07-28).
     if a.key and not a.record and subprocess.call(["bash", os.path.join(HERE, "disk_guard.sh")]) != 0:
         sys.exit(3)
+    # proprioception: a new drive must not record into a registry it cannot prove is intact (fail-closed)
+    if a.key and not a.record and subprocess.call(
+            [sys.executable, os.path.join(HERE, "proprioception.py"), "assert", "registry"]) != 0:
+        sys.exit(3)
     rows = P.parse_registry(with_extras=False)
     if a.design:
         r = next((x for x in rows if x["key"] == a.design), None)
