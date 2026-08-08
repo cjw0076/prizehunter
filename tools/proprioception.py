@@ -259,7 +259,47 @@ def sense_gate():
     return ALIVE, "every advertised verb has a live arm; doctor 0 CRITICAL"
 
 
-SENSES = ["registry", "dashboard", "eval", "loops", "gate"]
+def _num(x):
+    try:
+        return float(str(x).split()[0])
+    except (ValueError, IndexError, AttributeError):
+        return None
+
+
+def sense_verdict(active):
+    """Is the VERDICT AUTHORITY sane? A row whose `direction` is inverted makes goal_loop declare AT_#1 (false
+    victory) and stop driving — the exact bug that left arc-whitebox undriven while 29x BEHIND #1. Signature:
+    verdict says AT/ABOVE #1 while best and rank1 are orders of magnitude apart."""
+    worst, notes = ALIVE, []
+    for r in active:
+        b, r1, d = _num(r.get("best")), _num(r.get("rank1")), r.get("direction")
+        if b is None or r1 is None or b <= 0 or r1 <= 0:
+            continue
+        at1 = (b >= r1) if d == "max" else (b <= r1)
+        ratio = max(b, r1) / min(b, r1)
+        if at1 and ratio > 1.5:
+            worst = DEAD
+            notes.append(f"{r['key']}: verdict AT_#1 but best/rank1 {ratio:.0f}x apart under dir={d} — "
+                         f"direction likely inverted (false victory → row never driven)")
+    return worst, ("; ".join(notes) if notes else "verdict authority sane (no false-AT_#1 / inverted dir)")
+
+
+def sense_process():
+    """Process hygiene: leaked cockpit daemons accumulate (13 --no-loop prizehunterd were live on 2026-08-08,
+    from unreaped smoke test daemons). Flag before it becomes contention."""
+    try:
+        out = subprocess.run(["ps", "-eo", "args"], capture_output=True, text=True, timeout=10).stdout
+    except Exception:
+        return BLIND, "cannot enumerate processes"
+    noloop = sum(1 for l in out.splitlines() if "prizehunterd.py" in l and "--no-loop" in l and "grep" not in l)
+    if noloop > 3:
+        return DEAD, f"{noloop} leaked '--no-loop' prizehunterd daemons — reap them (kill the --no-loop PIDs)"
+    if noloop > 1:
+        return STALE, f"{noloop} '--no-loop' daemons (a couple is ok; watch for accumulation)"
+    return ALIVE, f"{noloop} leaked daemon(s)"
+
+
+SENSES = ["registry", "dashboard", "eval", "loops", "gate", "verdict", "process"]
 
 
 def run_all():
@@ -272,6 +312,8 @@ def run_all():
     res["eval"] = sense_eval(active)
     res["loops"] = sense_loops(active)
     res["gate"] = sense_gate()
+    res["verdict"] = sense_verdict(active)
+    res["process"] = sense_process()
     return res
 
 
